@@ -2,10 +2,10 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <link rel="icon" href="/icons/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" href="/icons/icon-192.png">
-  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="icons/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Johnny/Vivian">
@@ -5416,7 +5416,7 @@ async function ensureServiceWorkerReady(){
   if(!("serviceWorker" in navigator)) throw new Error("No serviceWorker support");
 
   // ✅ 只 register 一次
-  const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+  const reg = await navigator.serviceWorker.register("sw.js", { scope: "./" });
 
   // ✅ 等 SW ready（很重要）
   await navigator.serviceWorker.ready;
@@ -5441,8 +5441,7 @@ async function getPushEnabledForTrip(tripId){
   if(!("PushManager" in window)) return false;
   if(Notification.permission !== "granted") return false;
 
-  const reg = await navigator.serviceWorker.getRegistration("/") 
-           || await navigator.serviceWorker.getRegistration();
+  const reg = await navigator.serviceWorker.getRegistration();
   if(!reg) return false;
 
   const sub = await reg.pushManager.getSubscription();

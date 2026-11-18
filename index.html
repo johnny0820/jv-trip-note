@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="icon" href="icons/favicon.ico" sizes="any">
+  <link rel="icon" href="../icons/favicon.ico" sizes="any">
 	<link rel="icon" type="image/png" href="icons/icon-192.png">
 
-	<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+	<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
 
-	<link rel="manifest" href="/manifest.webmanifest">
+	<link rel="manifest" href="manifest.webmanifest">
 
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-title" content="Johnny/Vivian">
@@ -606,14 +606,19 @@
 
 	async function ensureServiceWorkerReady(){
 	  if(!("serviceWorker" in navigator)) return null;
-	  const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
-	  await navigator.serviceWorker.ready;
-	  return reg;
+	  try{
+	    const reg = await navigator.serviceWorker.register("sw.js", { scope: "./" });
+	    await navigator.serviceWorker.ready;
+	    return reg;
+	  }catch(e){
+	    console.warn("ensureServiceWorkerReady failed:", e);
+	    return null;
+	  }
 	}
 
 	async function getCurrentSubscription(){
 	  if(!("serviceWorker" in navigator)) return null;
-	  const reg = await navigator.serviceWorker.getRegistration("/") || await navigator.serviceWorker.getRegistration();
+	  const reg = await navigator.serviceWorker.getRegistration();
 	  if(!reg) return null;
 	  return await reg.pushManager.getSubscription();
 	}
@@ -686,13 +691,18 @@
 	
 	async function canEditFromWorker(){
 	  const deviceId = getDeviceId();
-	  const res = await fetch(`${PUSH_WORKER}/api/edit/can-edit`, {
-	    method: "POST",
-	    headers: { "content-type":"application/json" },
-	    body: JSON.stringify({ deviceId })
-	  });
-	  const data = await res.json().catch(()=>({}));
-	  return !!data?.canEdit;
+	  try{
+	    const res = await fetch(`${PUSH_WORKER}/api/edit/can-edit`, {
+	      method: "POST",
+	      headers: { "content-type":"application/json" },
+	      body: JSON.stringify({ deviceId })
+	    });
+	    const data = await res.json().catch(()=>({}));
+	    return !!data?.canEdit;
+	  }catch(e){
+	    console.warn("canEditFromWorker failed:", e);
+	    return false;
+	  }
 	}
 
 	async function unlockByWorker(password){
@@ -872,7 +882,7 @@
   
 async function registerSW(){
   if(!("serviceWorker" in navigator)) return;
-  await navigator.serviceWorker.register("/sw.js");
+  await navigator.serviceWorker.register("sw.js", { scope: "./" }).catch(e => console.warn("SW register failed:", e));
 }
 registerSW();
 
@@ -1503,10 +1513,10 @@ document.getElementById("cropOk").addEventListener("click", async () => {
 	  await render();
 	}, true);
 	  
-  await ensureServiceWorkerReady();
-	await loadPushStateFromDb();
+  try{ await ensureServiceWorkerReady(); }catch(e){ console.warn(e); }
+	try{ await loadPushStateFromDb(); }catch(e){ console.warn(e); }
 
-	CAN_EDIT = await resolveEditPermission();
+	try{ CAN_EDIT = await resolveEditPermission(); }catch(e){ console.warn(e); CAN_EDIT = false; }
 
 	await render();
 
