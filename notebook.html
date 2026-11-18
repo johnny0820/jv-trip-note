@@ -1,0 +1,5576 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="/icons/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Johnny/Vivian">
+  <meta name="theme-color" content="#fbf7f0">
+  <title>Johnny &amp; Vivian｜旅遊筆記</title>
+  
+<style>
+	  :root{
+	  --paper:#fbf7f0; --paper2:#f6f0e6; --ink:#2b2b2b; --muted:#6b6b6b;
+	  --lavender:#7c6ee6; --lavender2:#a89cf2;
+	  --line:#e6e0f2; --grid:rgba(124,110,230,.10);
+	  --cardShadow: 0 6px 18px rgba(40,40,60,.06);
+	  --tap: 44px;
+	}
+
+	/* ===== Base ===== */
+	*{ box-sizing:border-box; }
+	html, body{ height:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
+
+	body{
+	  margin:0;
+	  font-family: ui-sans-serif, system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+	  color: var(--ink);
+	  background:
+	    linear-gradient(var(--grid) 1px, transparent 1px),
+	    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+	    var(--paper); /* 純色 */
+	  background-size: 24px 24px, 24px 24px, auto;
+	}
+
+	a{ color:inherit; }
+	.app, .sidebar, .main, .grid, .card{ min-width:0; }
+
+	.app{
+	  display:grid;
+	  grid-template-columns: 320px minmax(0, 1fr);
+	  min-height:100vh;
+	}
+
+	/* ===== Sidebar ===== */
+	.sidebar{
+	  border-right: 1px solid var(--line);
+	  padding: 14px;
+	  background: rgba(255,255,255,.35);
+	  overflow: visible;
+	}
+	.topDock{ overflow: visible; }
+
+	.sideHero{
+	  position: relative;
+	  border: 1px solid var(--line);
+	  border-radius: 0;
+	  overflow: hidden;
+	  background: linear-gradient(135deg, rgba(124,110,230,.18), rgba(220,236,255,.55));
+	  background-size: cover;
+	  background-position: center;
+	  padding: 12px;
+	  min-height: 120px;
+	}
+	.sideHeroOverlay{
+	  position:absolute; inset:0;
+	  background: linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.26));
+	  pointer-events:none;
+	}
+	.sideTop{ position:relative; z-index:1; }
+
+	.title{
+	  font-size:20px; font-weight:900; letter-spacing:.2px;
+	  display:flex; align-items:center; justify-content:space-between; gap:12px;
+	  padding: 8px 10px;
+	  border-radius: 14px;
+	  background: rgba(255,255,255,.55);
+	  border: 1px solid rgba(255,255,255,.45);
+	  backdrop-filter: blur(8px);
+	  -webkit-backdrop-filter: blur(8px);
+	}
+	.badge{
+	  font-size:12px; color:var(--muted);
+	  border:1px solid rgba(255,255,255,.55);
+	  padding:4px 10px;
+	  border-radius:999px;
+	  white-space:nowrap;
+	  background: rgba(255,255,255,.85);
+	  backdrop-filter: blur(6px);
+	  -webkit-backdrop-filter: blur(6px);
+	}
+
+	.row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+	/* ===== Controls ===== */
+	.btn{
+	  appearance:none;
+	  border:1px solid rgba(255,255,255,.80);
+	  background: rgba(255,255,255,.92);
+	  color: var(--ink);
+	  padding:9px 10px;
+	  border-radius:12px;
+	  cursor:pointer;
+	  font-weight:900;
+	  font-size:13px;
+	  box-shadow: 0 6px 18px rgba(0,0,0,.10);
+	  backdrop-filter: blur(6px);
+	  -webkit-backdrop-filter: blur(6px);
+	  touch-action: manipulation;
+	}
+	.btn:hover{ border-color: rgba(124,110,230,.35); background: rgba(255,255,255,.96); }
+
+	.btn.primary{
+	  border-color: rgba(124,110,230,.55);
+	  background: rgba(124,110,230,.26);
+	}
+	.btn.primary:hover{ background: rgba(124,110,230,.32); }
+
+	.btn.bad{
+	  border-color: rgba(212,106,122,.55);
+	  background: rgba(212,106,122,.14);
+	  box-shadow: 0 2px 10px rgba(40,40,60,.05);
+	  backdrop-filter: none;
+	  -webkit-backdrop-filter: none;
+	}
+
+	.input, textarea{
+	  width:100%;
+	  border:1px solid rgba(255,255,255,.75);
+	  background: rgba(255,255,255,.92);
+	  color: var(--ink);
+	  border-radius:12px;
+	  padding:10px 12px;
+	  font-size:13px;
+	  box-shadow: 0 1px 0 rgba(124,110,230,.08) inset;
+	  backdrop-filter: blur(6px);
+	  -webkit-backdrop-filter: blur(6px);
+	}
+	textarea{
+	  min-height: 120px;
+	  resize: vertical;
+	  line-height:1.6;
+	  backdrop-filter: none;
+	  -webkit-backdrop-filter: none;
+	  border:1px solid var(--line);
+	  background: rgba(255,255,255,.75);
+	}
+
+	/* ===== Day dock + list ===== */
+	.dayDockSpacer{ display:none; height:0; }
+	.dayDock{ position: relative; overflow: visible; }
+
+	.dayList{
+	  margin-top: 10px;
+	  display:flex;
+	  flex-direction: row;
+	  gap: 10px;
+	  flex-wrap: nowrap;
+	  overflow-x: auto;
+	  overflow-y: hidden;
+	  padding-bottom: 8px;
+	  padding-right: 64px;           /* 給右下角的記帳 FAB 留空 */
+	  width: 100%;
+	  max-width: 100%;
+	  scroll-snap-type: x mandatory;
+	  -webkit-overflow-scrolling: touch;
+	  overscroll-behavior-x: contain;
+	  
+	}
+	.dayList::-webkit-scrollbar{ height: 10px; }
+	.dayList::-webkit-scrollbar-thumb{ background: rgba(124,110,230,.25); border-radius: 999px; }
+	.dayList::-webkit-scrollbar-track{ background: rgba(255,255,255,.20); }
+
+	.dayItem{
+	  border:1px solid var(--line);
+	  border-radius:12px;
+	  padding:10px;
+	  cursor:pointer;
+	  background: rgba(255,255,255,.78);
+	  box-shadow: 0 2px 10px rgba(40,40,60,.05);
+	  flex: 0 0 auto;
+	  width: clamp(170px, 40vw, 240px);
+	  scroll-snap-align: start;
+
+	  display:flex;
+	  flex-wrap: wrap;
+	  align-items: flex-start;
+	  gap: 6px 10px;
+	}
+	.dayItem:hover{ border-color: rgba(124,110,230,.45); background: rgba(168,156,242,.18); }
+	.dayItem.active{ border-color: rgba(124,110,230,.70); background: rgba(124,110,230,.16); }
+
+	.dayTopRow{
+	  width: 100%;
+	  display:flex;
+	  align-items:flex-start;
+	  justify-content: space-between;
+	  gap: 10px;
+	  min-width: 0;
+	}
+	.dayItem .dayTopRow .pill{ margin-top:-2px; margin-right:-2px; }
+
+	.dayName{
+	  font-weight: 900;
+	  min-width: 0;
+	  overflow:hidden;
+	  text-overflow: ellipsis;
+	  white-space: nowrap;
+	}
+	.dayThemeLine{
+	  width: 100%;
+	  font-size: 12px;
+	  color:var(--muted);
+	  display:-webkit-box;
+	  -webkit-line-clamp: 2;
+	  -webkit-box-orient: vertical;
+	  overflow:hidden;
+	}
+	.dayThemeLine:empty{ display:none; }
+
+	.pill{
+	  font-size:11px; color:var(--muted);
+	  border:1px solid var(--line);
+	  padding:2px 5px;
+	  border-radius:999px;
+	  white-space:nowrap;
+	  background: rgba(255,255,255,.75);
+	  flex: 0 0 auto;
+	}
+	.dayItem.addDay{
+	  justify-content:center;
+	  align-items:center;
+	  border-style: dashed;
+	  background: rgba(120,120,120,.12);
+	  color: rgba(43,43,43,.85);
+	  font-weight: 900;
+	  font-size: 18px;
+	  letter-spacing: .5px;
+	}
+
+	/* 日期 pill 可點 */
+	#dayPill, .dayItem .pill{ cursor:pointer; user-select:none; }
+	.dayPillWrap{ position: relative; display:inline-flex; align-items:center; }
+	.dayDateOverlay{ position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; }
+
+	/* dayDock 右下角記帳 FAB */
+	.dayDockFab{
+	  position: absolute;
+	  left: 12px;
+	  right: auto;
+	  bottom: -28px;
+	  z-index: 300;
+	}
+	.dayDockFabBtn{
+	  width: 56px;
+	  height: 56px;
+	  border-radius: 999px;
+	  border: 1px solid rgba(255,255,255,.65);
+	  background: rgba(255,255,255,.92);
+	  backdrop-filter: blur(10px);
+	  -webkit-backdrop-filter: blur(10px);
+	  box-shadow: 0 14px 32px rgba(0,0,0,.18);
+	  cursor: pointer;
+	  font-size: 40px;
+	  font-weight: 900;
+	  display:flex;
+	  align-items:center;
+	  justify-content:center;
+	}
+
+	/* ===== Main layout ===== */
+	.main{ padding:18px; }
+	.grid{
+	  display:grid;
+	  grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+	  gap:14px;
+	}
+
+	.card{
+	  border:1px solid var(--line);
+	  border-radius:14px;
+	  background: rgba(255,255,255,.72);
+	  box-shadow: var(--cardShadow);
+	  padding:14px;
+	}
+	.card h2{
+	  margin:0 0 10px 0;
+	  font-size:14px;
+	  letter-spacing:.2px;
+	  display:flex;
+	  align-items:center;
+	  justify-content:space-between;
+	  gap:10px;
+	}
+	.card h3{
+	  margin:14px 0 8px 0;
+	  font-size:13px;
+	  color: var(--ink);
+	  opacity:.85;
+	}
+
+	.titleTag{
+	  background: rgba(255,255,255,.92);
+	  border: 1px solid var(--line);
+	  padding: 4px 10px;
+	  border-radius: 999px;
+	  display: inline-block;
+	}
+
+	/* ===== meta panel ===== */
+	details.metaPanel{
+	  border: 1px solid var(--line);
+	  border-radius: 14px;
+	  background: rgba(255,255,255,.70);
+	  padding: 10px;
+	}
+	details.metaPanel > summary{
+	  list-style: none;
+	  cursor: pointer;
+	  font-weight: 900;
+	  display:flex;
+	  align-items:center;
+	  justify-content:space-between;
+	  gap: 10px;
+	  padding: 4px 2px;
+	}
+	details.metaPanel > summary::-webkit-details-marker{ display:none; }
+	.metaSummaryRight{
+	  font-size:12px;
+	  color: var(--muted);
+	  font-weight: 900;
+	  white-space: nowrap;
+	}
+
+	.kvs{
+	  display:grid;
+	  grid-template-columns: 120px 1fr;
+	  gap:8px 10px;
+	  align-items:center;
+	}
+	.k{ color:var(--muted); font-size:12px; }
+
+	/* ===== stay photo ===== */
+	.stayWrap{
+	  display:grid;
+	  grid-template-columns: 1fr 140px;
+	  gap: 10px;
+	  align-items:start;
+	}
+	.stayPhoto{
+	  border: 1px solid var(--line);
+	  border-radius: 12px;
+	  overflow:hidden;
+	  background: rgba(255,255,255,.70);
+	  height: 92px;
+	  position: relative;
+	  cursor: pointer;
+	}
+	.stayPhoto img{ width:100%; height:100%; object-fit: cover; display:block; }
+	.stayPhotoPlaceholder{
+	  width:100%; height:100%;
+	  display:flex;
+	  align-items:center;
+	  justify-content:center;
+	  font-size:12px;
+	  color: var(--muted);
+	  background: rgba(124,110,230,.08);
+	  padding: 8px;
+	  text-align:center;
+	}
+	.stayPhotoTools{
+	  position:absolute;
+	  right: 8px;
+	  bottom: 8px;
+	  display:flex;
+	  gap: 8px;
+	}
+	.miniBtn{
+	  border: 1px solid rgba(255,255,255,.7);
+	  background: rgba(255,255,255,.92);
+	  border-radius: 10px;
+	  padding: 6px 8px;
+	  font-size: 12px;
+	  font-weight: 900;
+	  cursor:pointer;
+	}
+
+	/* ===== spots ===== */
+	.spotList{ display:flex; flex-direction: column; gap: 10px; }
+	.spotRow{
+	  border: 1px solid var(--line);
+	  border-radius: 14px;
+	  background: rgba(255,255,255,.78);
+	  box-shadow: 0 2px 10px rgba(40,40,60,.05);
+	  padding: 10px;
+	  display:flex;
+	  gap: 10px;
+	  align-items:center;
+	  cursor:pointer;
+	  touch-action: pan-y;
+  	transition: background-color .12s ease, border-color .12s ease, box-shadow .12s ease;
+	}
+	.spotRow{ touch-action: pan-y; } /* 讓上下滑順 */
+	.spotHandle{
+	  width: 34px;
+	  height: 34px;
+	  flex: 0 0 auto;
+	  display: grid;
+	  place-items: center;
+	  border: 1px solid var(--line);
+	  border-radius: 12px;
+	  background: rgba(255,255,255,.75);
+	  color: var(--muted);
+	  font-weight: 900;
+	  cursor: grab;
+	  user-select: none;
+	}
+	.spotHandle:active{ cursor: grabbing; }
+	.spotThumb{
+	  width: 72px;
+	  height: 54px;
+	  border-radius: 12px;
+	  border: 1px solid var(--line);
+	  overflow:hidden;
+	  background: rgba(124,110,230,.08);
+	  flex: 0 0 auto;
+	}
+	.spotThumb img{ width:100%; height:100%; object-fit: cover; display:block; }
+	.spotThumbPh{
+	  width:100%; height:100%;
+	  display:flex; align-items:center; justify-content:center;
+	  font-size:11px; color: var(--muted);
+	  padding: 6px;
+	  text-align:center;
+	}
+	.spotInfo{
+	  flex: 1;
+	  min-width: 0;
+	  display:flex;
+	  flex-direction: column;
+	  gap: 2px;
+	}
+	.spotTitleLine{ font-weight: 900; overflow:hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.spotSubLine{ font-size: 12px; color: var(--muted); overflow:hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+	.btn.sm{
+	  padding: 7px 9px;
+	  border-radius: 10px;
+	  font-size: 12px;
+	  box-shadow: none;
+	  backdrop-filter: none;
+	  -webkit-backdrop-filter: none;
+	}
+	
+	.spotList.isDragging .spotRow{
+	  background: rgba(124,110,230,.10);
+	  border-color: rgba(124,110,230,.35);
+	}
+	.spotList.isDragging .spotRow .swipeContent{
+	  transition: none !important; /* 只關掉左滑刪除那個 translateX 的動畫 */
+	}
+	.spotAddRow{
+	  border: 2px dashed rgba(120,120,120,.28);
+	  border-radius: 14px;
+	  background: rgba(120,120,120,.10);
+	  padding: 12px;
+	  display:flex;
+	  align-items:center;
+	  justify-content:center;
+	  font-weight: 900;
+	  cursor:pointer;
+	  color: rgba(43,43,43,.85);
+	  user-select: none;
+	}
+
+	/* ===== todos ===== */
+	.todoTabs{
+	  display:flex;
+	  gap: 8px;
+	  flex-wrap: wrap;
+	  margin: 8px 0 10px 0;
+	}
+	.todoTab{
+	  border: 1px solid var(--line);
+	  background: rgba(255,255,255,.75);
+	  border-radius: 999px;
+	  padding: 6px 10px;
+	  font-size: 12px;
+	  font-weight: 900;
+	  cursor: pointer;
+	  user-select: none;
+	  line-height: 1;
+	}
+	.todoTab.active{
+	  border-color: rgba(124,110,230,.65);
+	  background: rgba(124,110,230,.16);
+	}
+	.todoTab.add{
+	  border-style: dashed;
+	  background: rgba(120,120,120,.10);
+	}
+	.todoTabCount{
+	  margin-left: 6px;
+	  padding: 2px 6px;
+	  border-radius: 999px;
+	  border: 1px solid rgba(0,0,0,.06);
+	  background: rgba(255,255,255,.70);
+	  font-size: 11px;
+	  color: var(--muted);
+	}
+
+	.checklist{ display:flex; flex-direction:column; gap:8px; }
+	.checkItem{
+	  display:flex;
+	  gap:8px;
+	  align-items:center;
+	  border:1px solid var(--line);
+	  border-radius:12px;
+	  padding:8px 10px;
+	  background: rgba(255,255,255,.78);
+	}
+	.checkItem input[type="checkbox"]{ width: 18px; height: 18px; flex: 0 0 auto; }
+	.checkItem input[type="text"]{
+	  border:none; outline:none; background:transparent; color:var(--ink);
+	  width:100%;
+	  font-size:16px;
+	  font-weight: 900;
+	}
+	.checkItem input[type="checkbox"]:checked + input[type="text"]{
+	  text-decoration: line-through;
+	  opacity: .55;
+	}
+
+	/* Todo 左滑刪除 */
+	.checkItem.todoRow{
+	  touch-action: pan-y;
+	  transition: transform .12s ease;
+	}
+	.todoDelBtn{
+	  width: 32px; height: 32px;
+	  padding: 0;
+	  border-radius: 10px;
+	  display:flex; align-items:center; justify-content:center;
+	  font-size: 14px;
+	  font-weight: 900;
+	  box-shadow: none;
+	  backdrop-filter: none;
+	  -webkit-backdrop-filter: none;
+	}
+
+	/* ===== expenses ===== */
+
+	table{ width:100%; border-collapse:collapse; font-size:14px; }
+	th, td{
+	  border-bottom:1px solid var(--line);
+	  padding:8px 6px;
+	  text-align:left;
+	  vertical-align: top;
+	}
+	th{ color: var(--ink); font-weight:900; font-size:12px; letter-spacing:.2px; }
+	.right{ text-align:right; }
+	.sum{ font-weight:900; }
+
+	/* 分類統計（點 pill 篩選） */
+	.expenseTopBar{ display:flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+	.sumRow{ display:flex; gap: 10px; flex-wrap: wrap; color: var(--muted); font-size: 12px; font-weight: 900; }
+	.sumBox{
+	  border: 1px solid var(--line);
+	  background: rgba(255,255,255,.65);
+	  border-radius: 12px;
+	  padding: 6px 10px;
+	  white-space: nowrap;
+	  cursor: pointer;
+	  user-select: none;
+	}
+	.sumBox.active{
+	  border-color: rgba(124,110,230,.65);
+	  background: rgba(124,110,230,.16);
+	}
+	.sumBox.add{
+	  border-style: dashed;
+	  background: rgba(120,120,120,.10);
+	}
+	
+	.sumMini{
+	  font-size: 11px;
+	  color: var(--muted);
+	  font-weight: 900;
+	  margin-left: 6px;
+	  white-space: nowrap;
+	}
+	
+	/* ✅ Expense sum pill：數字/幣別顏色分離 */
+	.sumBox .sumAmt{
+	  color: #111;   /* 你想更明顯可用 #7c6ee6；想低調可改成 rgba(...) */
+	}
+
+	.sumBox .sumCcy{
+	  color: var(--muted);      /* 幣別跟 ALL 同色 */
+	  margin-left: 4px;
+	}
+
+	/* =========================
+	   Expense table（桌機＋手機共用）
+	   ========================= */
+	#expenseCard table,
+	#expenseDetails table{
+	  width: 100%;
+	  table-layout: fixed;     /* ✅ 固定欄寬：避免跑版 */
+	  border-collapse: collapse;
+	  font-size: 12px;         /* ✅ 更緊湊 */
+	}
+
+	/* ✅ 只影響花費表格：縮小上下左右 padding */
+	#expenseCard th, #expenseCard td,
+	#expenseDetails th, #expenseDetails td{
+	  padding: 1px 2px;
+	  vertical-align: middle;
+	}
+
+	/* 分類欄（emoji） */
+	#expenseCard th.expColCat, #expenseCard td.expColCat,
+	#expenseDetails th.expColCat, #expenseDetails td.expColCat{
+	  width: 32px;                 /* ✅ 分類欄更窄 */
+	  padding-left: 0;
+	  padding-right: 0;
+	  overflow: hidden;            /* ✅ 防止 select 溢出壓到項目名稱 */
+	}
+
+	/* 項目欄撐滿剩餘空間 */
+	#expenseCard th:nth-child(2), #expenseCard td:nth-child(2),
+	#expenseDetails th:nth-child(2), #expenseDetails td:nth-child(2){
+	  width: auto;
+	  min-width: 0;
+	}
+
+	/* 金額欄 */
+	#expenseCard th.expColAmt, #expenseCard td.expColAmt,
+	#expenseDetails th.expColAmt, #expenseDetails td.expColAmt{
+	  width: 60px;                 /* ✅ 金額欄位長度 */
+	  text-align: right;
+	  white-space: nowrap;
+	  padding-left: 2px;
+	  padding-right: 0;
+	}
+
+	/* 刪除欄（小 X） */
+	#expenseCard th.expColDel,
+	#expenseDetails th.expColDel{
+	  width: 30px;
+	  padding: 1px 2px;          /* ✅ 跟其他 th 一致，表頭就不會掉下去 */
+	  vertical-align: middle;
+	  text-align: center;        /* 表頭放 ↕︎ 置中 */
+	}
+
+	#expenseCard td.expColDel,
+	#expenseDetails td.expColDel{
+	  width: 30px;
+	  padding: 0;                /* ✅ 內容列維持緊湊 */
+	  vertical-align: middle;
+	  text-align: right;         /* 內容列 X 靠右 */
+	}
+	
+	
+	/* ===== 花費：排序 icon（放在表頭最後一格） ===== */
+	.expSortWrap{
+	  position: relative;
+	  width: 30px;
+	  height: 30px;
+	  display: flex;                 /* ✅ 改這裡：用 flex */
+	  align-items: center;           /* ✅ 垂直置中 */
+	  justify-content: center;       /* ✅ 水平置中 */
+	  margin: 0 auto;                /* ✅ 讓它在 th 裡更穩定置中 */
+	}
+
+	.expSortBtn{
+	  border: 0;
+	  background: transparent;
+	  color: rgba(0,0,0,.35);
+	  font-size: 18px;
+	  font-weight: 300;
+	  line-height: 1;               /* ✅ 改回 1，交給 flex 置中 */
+	  margin: 0;
+	  display: block;               /* ✅ 避免 inline 的基線影響 */
+	  transform: translateY(-1px);  /* ✅ 往上移：-1px ~ -4px  */
+	}
+
+	/* 透明 select 疊在 icon 上：點 icon 就會跳原生選單 */
+	.expSortSelect{
+	  position: absolute;
+	  inset: 0;
+	  opacity: 0;
+	  cursor: pointer;
+
+	  -webkit-appearance: none;
+	  -moz-appearance: none;
+	  appearance: none;
+	  background-image: none !important;
+	}
+
+	/* 分類 select（只顯示 icon） */
+	#expenseCard select.expCat,
+	#expenseDetails select.expCat{
+	  width: 32px;                 /* ✅ 重要：跟欄寬一致，避免壓到下一欄 */
+	  max-width: 100%;
+	  box-sizing: border-box;
+
+	  height: 36px;                /* ✅ emoji 上下不被切 */
+	  line-height: 36px;
+	  padding: 0 !important;
+
+	  display: block;              /* ✅ 不用 grid，避免裁切 */
+	  margin: 0;                   /* ✅ 靠左（不要再用 -1 這種） */
+
+	  -webkit-appearance: none;
+	  -moz-appearance: none;
+	  appearance: none;
+	  background-image: none !important;
+
+	  border: 1px solid var(--line);
+	  background: rgba(255,255,255,.85);
+	  color: var(--ink);
+	  border-radius: 10px;
+
+	  font-size: 18px;
+	  font-weight: 900;
+	  text-align: center;
+	  text-align-last: center;
+	}
+	#expenseCard select.expCat::-ms-expand,
+	#expenseDetails select.expCat::-ms-expand{ display:none; }
+	
+	/* ===== 花費：分類欄內的付款人角標 ===== */
+	.expCatWrap{
+	  position: relative;
+	  width: 32px;        /* 跟你的分類欄寬一致 */
+	  height: 36px;       /* 跟 expCat 高度一致 */
+	}
+
+	.expCatWrap > select.expCat{
+	  width: 32px;        /* 保險：避免被 wrap 影響 */
+	  height: 36px;
+	}
+
+	.expPayerBtn{
+	  position: absolute;
+	  top: 0px;
+	  right: 0px;
+
+	  width: 16px;
+	  height: 16px;
+	  padding: 0;
+
+	  border: 0;                 /* ✅ 無邊框 */
+	  background: transparent;    /* ✅ 透明底 */
+	  line-height: 1;
+	  font-size: 12px;
+	  cursor: pointer;
+
+	  opacity: .7;               /* ✅ 淡一點，不搶分類 icon */
+	}
+
+	.expPayerBtn:hover{ opacity: .95; }
+	.expPayerBtn:active{ opacity: 1; }
+
+	/* 項目 input */
+	#expenseCard .expNameInput,
+	#expenseDetails .expNameInput{
+	  width: 100%;
+	  min-width: 0;
+	  height: 30px;
+	  padding: 2px 6px;
+	  font-size: 12px;
+	  font-weight: 900;
+	  text-overflow: ellipsis;
+	}
+
+	/* 金額 input */
+	#expenseCard td.expColAmt .input,
+	#expenseDetails td.expColAmt .input{
+	  width: 100%;
+	  min-width: 0;
+	  height: 30px;
+	  padding: 2px 4px;
+	  text-align: right;
+	  font-size: 12px;
+	  font-variant-numeric: tabular-nums;
+	  font-weight: 900; 
+	}
+
+	/* 小 X 按鈕 */
+	.expDelBtn{
+	  width: 24px;
+	  height: 24px;
+	  border-radius: 8px;
+
+	  border: 1px solid rgba(0,0,0,.18);
+	  background: rgba(0,0,0,.06);
+	  color: rgba(0,0,0,.55);
+
+	  font-weight: 900;
+	  cursor: pointer;
+	  line-height: 1;
+	  font-size: 12px;
+	}
+
+	.expDelBtn:hover{
+	  background: rgba(0,0,0,.10);
+	  border-color: rgba(0,0,0,.24);
+	  color: rgba(0,0,0,.70);
+	}
+
+	.expDelBtn:active{
+	  background: rgba(0,0,0,.14);
+	}
+
+	/* ===== Modal / lightbox ===== */
+	.modalMask{
+	  position: fixed;
+	  inset: 0;
+	  background: rgba(15,23,42,.45);
+	  display: none;
+	  align-items:center;
+	  justify-content:center;
+	  z-index: 999;
+	  padding: 16px;
+	}
+	.modal{
+	  width: min(820px, 100%);
+	  background: rgba(255,255,255,.94);
+	  border: 1px solid var(--line);
+	  border-radius: 16px;
+	  box-shadow: 0 18px 60px rgba(0,0,0,.22);
+	  overflow: hidden;
+	  max-height: calc(100dvh - 32px);
+	  display:flex;
+	  flex-direction: column;
+	}
+	.modalHead{
+	  padding: 12px 14px;
+	  border-bottom: 1px solid var(--line);
+	  display:flex;
+	  align-items:center;
+	  justify-content:space-between;
+	  gap: 10px;
+	  flex: 0 0 auto;
+	}
+	.modalTitle{
+	  font-weight: 900;
+	  font-size: 14px;
+	  overflow:hidden;
+	  text-overflow: ellipsis;
+	  white-space: nowrap;
+	}
+	.modalBody{
+	  padding: 12px;
+	  overflow:auto;
+	  -webkit-overflow-scrolling: touch;
+	  flex: 1 1 auto;
+	}
+
+	.spotModalGrid{
+	  display:grid;
+	  grid-template-columns: 1fr 1fr;
+	  gap: 10px;
+	  align-items:start;
+	}
+	.photoWall{
+	  border: 1px solid var(--line);
+	  border-radius: 14px;
+	  overflow:hidden;
+	  background: rgba(124,110,230,.08);
+	  height: 240px;
+	  position: relative;
+	  cursor: pointer;
+	}
+	.photoWall img{ width:100%; height:100%; object-fit: cover; display:block; }
+	.photoWallPh{
+	  width:100%; height:100%;
+	  display:flex; align-items:center; justify-content:center;
+	  color: var(--muted);
+	  font-size: 12px;
+	  padding: 10px;
+	  text-align:center;
+	}
+	.photoWallTools{
+	  position:absolute;
+	  right: 10px;
+	  bottom: 10px;
+	  display:flex;
+	  gap: 8px;
+	}
+
+	.commentBox{
+	  border: 1px solid var(--line);
+	  border-radius: 14px;
+	  background: rgba(255,255,255,.78);
+	  padding: 10px;
+	  display:flex;
+	  flex-direction: column;
+	  gap: 8px;
+	}
+	.commentList{
+	  display:flex;
+	  flex-direction: column;
+	  gap: 4px;
+	  max-height: 240px;
+	  overflow:auto;
+	  padding-right: 4px;
+	}
+	.commentItem{
+	  border: 1px solid var(--line);
+	  border-radius: 12px;
+	  padding: 6px 8px;
+	  background: rgba(255,255,255,.92);
+	  font-size: 14px;
+	  line-height: 1.5;
+	  white-space: pre-wrap;
+	  word-break: break-word;
+	}
+	.commentItemRow{ display:flex; align-items:center; }
+	.commentTextLine{ flex: 1; min-width: 0; }
+	.commentContent{
+	  flex: 1;
+	  min-width: 0;
+	  white-space: pre-wrap;
+	  word-break: break-word;
+	}
+	.commentDelBtn{
+	  width: 28px;
+	  height: 28px;
+	  font-size: 13px;
+	  border-radius: 10px;
+	  padding: 0;
+	  margin-left: 8px;
+	  flex: 0 0 auto;
+	  display: inline-flex;
+	  align-items: center;
+	  justify-content: center;
+	}
+
+	.commentInputRow{ display:flex; gap: 8px; align-items:flex-start; }
+	
+	/* ===== Spot modal bottom bar ===== */
+	.spotBottomBar{
+	  margin-top: 10px;
+	  display:flex;
+	  justify-content: flex-start; /* ✅ 左下角 */
+	  align-items: center;
+	}
+
+	/* 垃圾桶 icon button（沿用 index 的風格） */
+	.trashIconBtn{
+	  width: 40px;
+	  height: 40px;
+	  padding: 0;
+	  border-radius: 12px;
+
+	  border: 1px solid rgba(212,106,122,.22);
+	  background: rgba(212,106,122,.10);
+	  box-shadow: none;
+
+	  display: inline-flex;
+	  align-items: center;
+	  justify-content: center;
+	  cursor: pointer;
+
+	  -webkit-tap-highlight-color: transparent;
+	}
+
+	.trashIconBtn svg{
+	  width: 18px;
+	  height: 18px;
+	  stroke: rgba(120,40,55,.78);
+	}
+
+	.trashIconBtn:hover{
+	  background: rgba(212,106,122,.14);
+	  border-color: rgba(212,106,122,.30);
+	}
+
+	.trashIconBtn:active{
+	  background: rgba(212,106,122,.18);
+	}
+		
+	.roleJV{
+	  border:1px solid var(--line);
+	  border-radius: 10px;
+	  padding: 10px 10px;
+	  font-weight: 900;
+	  background: rgba(255,255,255,.92);
+	  width: 64px;
+	  text-align: center;
+	  font-size: 16px;
+	}
+	.commentTa{
+	  flex: 1;
+	  min-height: 44px;
+	  resize: vertical;
+	  border: 1px solid var(--line);
+	  border-radius: 12px;
+	  padding: 10px 12px;
+	  background: rgba(255,255,255,.92);
+	  font-size: 16px;
+	  line-height: 1.6;
+	}
+
+	.roleBadge{
+	  display: inline-flex;
+	  align-items: center;
+	  justify-content: center;
+	  padding: 3px 8px;
+	  border-radius: 999px;
+	  border: 1px solid rgba(255,255,255,.70);
+	  box-shadow:
+	    0 2px 10px rgba(40,40,60,.10),
+	    inset 0 1px 0 rgba(255,255,255,.65);
+	  backdrop-filter: blur(6px);
+	  -webkit-backdrop-filter: blur(6px);
+	}
+	.roleBadge--J{ background: rgba(124,110,230,.55); }
+	.roleBadge--V{ background: rgba(212,106,122,.55); }
+
+	.lightboxImg{
+	  width: min(980px, 100%);
+	  max-height: 85vh;
+	  object-fit: contain;
+	  display:block;
+	  background: #000;
+	}
+
+	/* ===== Desktop right cards nicer ===== */
+	.card--side{
+	  background: rgba(255,255,255,.78);
+	  border: 1px solid rgba(124,110,230,.18);
+	  box-shadow: 0 10px 28px rgba(40,40,60,.08);
+	}
+	.card--side h2{
+	  position: sticky;
+	  top: 0;
+	  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.78));
+	  backdrop-filter: blur(8px);
+	  -webkit-backdrop-filter: blur(8px);
+	  border-bottom: 1px solid rgba(124,110,230,.10);
+	  padding-bottom: 10px;
+	  margin-bottom: 12px;
+	}
+	.card--side h2 .titleTag{
+	  border-color: rgba(124,110,230,.18);
+	  background: rgba(255,255,255,.95);
+	}
+
+	/* ===== Todo category modal size ===== */
+	.modal--todoCat{
+	  width: min(360px, 92vw);
+	  max-height: 52dvh;
+	  border-radius: 14px;
+	}
+	.modal--todoCat .modalHead{ padding: 8px 10px; }
+	.modal--todoCat .modalBody{ padding: 10px; flex: 0 0 auto; }
+
+	/* ===== Responsive ===== */
+	@media (max-width: 900px){
+	  html, body{ height:auto; overflow-y:auto; -webkit-overflow-scrolling: touch; }
+
+	  .app{ grid-template-columns: 1fr; }
+
+	  .sidebar{
+	    position: static;
+	    padding: 0;
+	    border-right: none;
+	    background: transparent;
+	  }
+
+	  .sideHero{ border:none; border-radius:0; padding:0; min-height:110px; }
+	  .sideTop{
+	    padding-top: calc(12px + env(safe-area-inset-top));
+	    padding-left: 12px;
+	    padding-right: 12px;
+	    padding-bottom: 12px;
+	    position: relative;
+	    z-index: 1;
+	  }
+
+	  .dayDock{
+	    position: -webkit-sticky;
+	    position: sticky;
+	    top: env(safe-area-inset-top);
+	    z-index: 80;
+	    background: rgba(251,247,240,.96);
+	    backdrop-filter: blur(10px);
+	    -webkit-backdrop-filter: blur(10px);
+	    border-top: 1px solid rgba(255,255,255,.35);
+	    border-bottom: 1px solid var(--line);
+	    box-shadow: 0 10px 24px rgba(40,40,60,.08);
+	  }
+	  .dayDock.isFixed{
+	    position: fixed;
+	    left: 0;
+	    right: 0;
+	    top: env(safe-area-inset-top);
+	    width: 100vw;
+	    z-index: 200;
+	  }
+
+	  .dayList{ margin-top:0; padding: 6px 12px 12px 12px; padding-right: 72px; }
+
+	  .main{
+	    padding: 12px;
+	    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+	  }
+	  .grid{ grid-template-columns: 1fr; gap: 12px; }
+	  .kvs{ grid-template-columns: 1fr; gap: 6px; }
+
+	  .input, textarea, select{ font-size:16px !important; }
+
+	  .stayWrap{ grid-template-columns: 1fr; }
+	  .stayPhoto{ height: 160px; }
+
+	  .commentList{ max-height: 320px; }
+	  .spotModalGrid{ grid-template-columns: 1fr; }
+	  .photoWall{ height: 220px; }
+
+	  .modalMask{
+	    padding:
+	      calc(12px + env(safe-area-inset-top))
+	      12px
+	      calc(12px + env(safe-area-inset-bottom));
+	    align-items: center;
+	  }
+	  .modal{ width: 100%; max-height: 100%; }
+
+	  /* mobile accordion card feel */
+	  details.accordion{
+	    border: 1px solid rgba(124,110,230,.18);
+	    background: rgba(255,255,255,.82);
+	    box-shadow: 0 12px 28px rgba(40,40,60,.10);
+	    border-radius: 16px;
+	    overflow: hidden;
+	  }
+	  details.accordion > summary{
+	    list-style:none;
+	    cursor:pointer;
+	    background: rgba(255,255,255,.92);
+	    border-bottom: 1px solid rgba(124,110,230,.10);
+	    padding: 12px 12px;
+	    font-size: 15px;
+	    font-weight: 900;
+	    display:flex;
+	    align-items:center;
+	    justify-content:space-between;
+	    gap: 10px;
+	  }
+	  details.accordion > summary::-webkit-details-marker{ display:none; }
+	  details.accordion .content{
+	    padding: 12px;
+	    background: rgba(255,255,255,.82);
+	  }
+
+	  .desktopCards{ display:none; }
+	  .mobileAccordions{ display:block; }
+
+	  /* 手機：隱藏代辦刪除按鍵（改用左滑） */
+	  .todoDelBtn{ display:none; }
+
+	  /* 手機：todoCat modal 更緊 */
+	  .modal--todoCat{
+	    width: min(380px, 92vw);
+	    max-height: 75dvh;
+	  }
+	}
+
+	@media (min-width: 901px){
+	  .mobileAccordions{ display:none; }
+	  .desktopCards{ display:block; }
+	}
+	
+	/* =========================
+   Swipe reveal delete (LINE style)
+   ========================= */
+/* ===== Swipe reveal delete (LINE style) ===== */
+.swipeHost{
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y;
+  --swipeX: 0px;
+  --swipeW: 84px;
+}
+
+/* 刪除按鈕（固定貼右，但「整個按鈕」會跟著 swipeX + swipeW 移動）
+   swipeX=0  → translateX(+W) → 完全在畫面外
+   swipeX=-W → translateX(0)  → 剛好露出完整按鈕 */
+.swipeActions{
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: var(--swipeW, 84px);
+  background: #e5484d;
+  display: flex;
+  z-index: 2;
+  transform: translateX(calc(var(--swipeX, 0px) + var(--swipeW, 84px)));
+  transition: transform .16s ease;
+  will-change: transform;
+}
+
+.swipeDeleteBtn{
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-weight: 900;
+  font-size: 14px;
+}
+/* 內容（在上面） */
+.swipeContent{
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  transform: translateX(var(--swipeX, 0px));
+  transition: transform .16s ease;
+  will-change: transform;
+}
+
+/* ===== Todo: host 只當遮罩，樣式交給 swipeContent ===== */
+.checkItem.todoRow.swipeHost{
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.checkItem.todoRow.swipeHost .swipeContent{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255,255,255,.78);
+}
+
+/* ===== Spot: 同理 ===== */
+.spotRow.swipeHost{
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.spotRow.swipeHost .swipeContent{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255,255,255,.78);
+  box-shadow: 0 2px 10px rgba(40,40,60,.05);
+}
+
+/* 跟著手移動的那個（ghost）要看得到 */
+.spotRow.spotGhost .swipeContent{
+  opacity: .95;
+}
+/* 按住（尚未拖曳）先上浮：用 chosenClass */
+.spotRow.spotChosen .swipeContent{
+  background: rgba(255,255,255,.92);
+  border-color: rgba(124,110,230,.55);
+  box-shadow: 0 18px 40px rgba(0,0,0,.18);
+}
+
+/* 避免 swipeHost 的 overflow:hidden 把陰影切掉（拖曳期間才放開） */
+.spotRow.spotChosen{
+  overflow: visible;
+}
+.spotRow.spotChosen .swipeActions{
+  opacity: 0;            /* 避免刪除紅底露出 */
+  pointer-events: none;
+}
+
+/* 拖曳時「原位置的佔位」淡化：用 ghostClass */
+.spotRow.spotGhost{
+  opacity: .18;
+}
+.spotRow.spotGhost .swipeContent{
+  box-shadow: none;
+}
+/* ===== DayList Long-press Menu ===== */
+.dayCtxMenu{
+  position: fixed;
+  z-index: 2000;
+  min-width: 160px;
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 18px 60px rgba(0,0,0,.18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: none;
+}
+
+.dayCtxMenu button{
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 12px 12px;
+  border-radius: 12px;
+  text-align: left;
+  font-weight: 900;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.dayCtxMenu button:hover{
+  background: rgba(168,156,242,.18);
+}
+
+.dayCtxMenu .danger{
+  color: rgba(160,40,60,.92);
+}
+.dayCtxMenu .danger:hover{
+  background: rgba(212,106,122,.14);
+}
+/* ✅ DayList：長按不要圈選文字 / iOS callout */
+.dayList, .dayItem, .dayItem,.sumRow, .sumBox, .sumBox,.todoTabs, .todoTab, .todoTab *{
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+
+/* ===== 今日回顧 Tabs ===== */
+.notesField{
+  position: relative;
+  margin-top: 8px;
+}
+
+/* tabs 貼在 textarea 上框線位置 */
+.notesTabs--overlay{
+  position: absolute;
+  top: -8px;          /* 往上貼到框線上（可微調 -10 ~ -14） */
+  left: 12px;
+  z-index: 2;
+
+  display: inline-flex;
+  gap: 6px;
+
+  padding: 0;                 /* ✅ 不需要遮框線 */
+  background: transparent;    /* ✅ 透明 */
+}
+
+/* tab 本體變成小 chip */
+.notesTab{
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.90);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  user-select: none;
+  line-height: 1;
+}
+
+.notesTab.active{
+  border-color: rgba(124,110,230,.55);          /* 邊框淡一點 */
+  background: #f1efff;            /* ✅ 柔和淡紫底（推薦 0.10~0.16） */
+  color: var(--ink);                            /* 字維持深色更好讀 */
+  box-shadow:
+    0 6px 14px rgba(124,110,230,.14),           /* 降低紫色陰影 */
+    inset 0 1px 0 rgba(255,255,255,.70);
+}
+/* textarea 上方留一點空間，避免視覺太擠（可選） */
+.notesTa{
+  padding-top: 14px; /* 想更貼近可改回 10px */
+}
+/* ===== ExpenseCat modal: 更小、更緊湊 ===== */
+#expenseCatMask .modal{
+  width: min(360px, 92vw);     /* ✅ 比原本 420 更小 */
+  max-height: 56dvh;           /* ✅ 不要太高 */
+  border-radius: 14px;
+}
+
+#expenseCatMask .modalHead{
+  padding: 10px 12px;          /* ✅ 頭縮短 */
+}
+
+#expenseCatMask .modalBody{
+  padding: 12px;               /* ✅ 內容縮短 */
+  flex: 0 0 auto;              /* ✅ 避免 modalBody 被 flex 撐出空白 */
+}
+
+/* 兩欄：左 label、右 input（兩行） */
+.expCatForm{
+  display: grid;
+  grid-template-columns: 84px 1fr;  /* 左邊固定寬，右邊撐滿 */
+  gap: 10px 10px;
+  align-items: center;
+}
+.expCatForm .k{ margin: 0; }
+
+/* 底部：左垃圾桶、中間大儲存 */
+.expCatFooter{
+  display: grid;
+  grid-template-columns: 44px 1fr ;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.expCatSaveBtn{
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  box-shadow: none;
+  justify-self: stretch;
+}
+
+/* 垃圾桶 icon button */
+.expCatDelIconBtn{
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 14px;
+  border: 1px solid rgba(212,106,122,.22);
+  background: rgba(212,106,122,.10);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.expCatDelIconBtn svg{
+  width: 18px;
+  height: 18px;
+  stroke: rgba(120,40,55,.70);
+}
+.expCatDelIconBtn:hover{
+  background: rgba(212,106,122,.14);
+  border-color: rgba(212,106,122,.30);
+}
+/* ===== Todo Category Modal: footer like expense ===== */
+#todoCatMask .modalHead{
+  padding: 10px 12px; /* 跟你想要的緊湊一致，可再調小 */
+}
+#todoCatMask .modalBody{
+  padding: 12px;
+}
+
+#todoCatMask .todoCatLabel{
+  margin: 0 0 6px 0;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--ink);
+}
+
+#todoCatMask .todoCatFooter{
+  display: grid;
+  grid-template-columns: 44px 1fr ; /* 左：刪除icon / 中：儲存置中 / 右：留空 */
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+#todoCatMask .todoCatSaveBtn{
+  width: 100%;
+  justify-self: center;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  box-shadow: none;
+}
+.todoCatSaveBtn{justify-self: stretch;}
+
+#todoCatMask .todoCatDelIconBtn{
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 14px;
+
+  border: 1px solid rgba(212,106,122,.22);
+  background: rgba(212,106,122,.10);
+  box-shadow: none;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+#todoCatMask .todoCatDelIconBtn svg{
+  width: 18px;
+  height: 18px;
+  stroke: rgba(120,40,55,.70);
+}
+
+#todoCatMask .todoCatDelIconBtn:hover{
+  background: rgba(212,106,122,.14);
+  border-color: rgba(212,106,122,.30);
+}
+/* ===== Push Bell Button ===== */
+
+.row.topActions{ justify-content: flex-end; }
+
+.bellBtn{
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;   /* ✅ 無方框底 */
+  box-shadow: none;          /* ✅ 無陰影框 */
+  border-radius: 999px;      /* 只是點擊範圍圓形（看不到框） */
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: rgba(0,0,0,.35);    /* OFF：灰色 */
+}
+
+/* ON：黃色 */
+.bellBtn.enabled{
+  color: #f2b705;            /* 黃色實心 */
+}
+
+/* icon size */
+.bellBtn svg{
+  width: 26px;
+  height: 26px;
+  display:block;
+}
+
+/* 實心鈴鐺 */
+.bellBtn .bell{
+  fill: currentColor;
+}
+
+/* OFF 的斜槓：顏色固定深灰，避免跟灰鈴鐺混在一起看不到 */
+.bellBtn .slash{
+  fill: none;
+  stroke: rgba(0,0,0,.55);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+/* ON 時不顯示斜槓 */
+.bellBtn.enabled .slash{
+  display: none;
+}
+
+/* ===== Card header: titleTag left, actions right ===== */
+.cardHeadRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+}
+
+.cardHeadActions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.currencyInput{
+  width: 96px;
+  max-width: 96px;
+  padding: 7px 10px;
+}
+
+.accSummary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.accTitle{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.accRight{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:0 0 auto;
+}
+
+.accCurrencyInput{
+  width: 88px;
+  padding: 6px 8px;
+  height: 34px;
+}
+
+.accAddBtn{
+  padding: 6px 10px;
+  height: 34px;
+}
+/* ✅ accordion summary：不要用 space-between，避免 ::after 變第三個元素造成分散 */
+details.accordion > summary.accSummary{
+  justify-content: flex-start;   /* 由左到右排 */
+}
+
+/* 標題撐滿，把右邊工具推到右側 */
+details.accordion > summary .accTitle{
+  flex: 1 1 auto;
+}
+
+/* 右側工具固定寬，不要被擠壓 */
+details.accordion > summary .accRight{
+  flex: 0 0 auto;
+}
+
+/* ✅ 右側展開箭頭（chevron） */
+details.accordion > summary.accSummary::after{
+  content: "▾";
+  color: rgba(0,0,0,.45);
+  font-size: 22px;
+  line-height: 1;
+  margin-left: 8px;
+  flex: 0 0 auto;
+  transition: transform .16s ease;
+}
+
+/* 展開時箭頭朝上 */
+details.accordion[open] > summary.accSummary::after{
+  transform: rotate(180deg);
+}
+
+
+/* ===== Expense table internal vertical scroll (no horizontal) ===== */
+.expTableWrap{
+  max-height: clamp(220px, 45vh, 420px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;            /* 只允許上下滑 */
+}
+
+#expenseDetails .expTableWrap{
+  max-height: clamp(240px, 48vh, 560px); /* 手機可稍大 */
+}
+
+.expTableWrap table{
+  width: 100%;
+  table-layout: fixed;            /* 避免撐出左右 */
+}
+
+#expenseDetails table,
+#expenseCard table{
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* 表頭在內滾容器中可固定（可選，但很好用） */
+.expTableWrap thead th{
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(255,255,255,.92);
+}
+.expenseDetailsTa{
+  min-height: 90px;
+  max-height: 220px;     /* 超過就內部滾動 */
+  overflow-y: auto;
+  resize: vertical;      /* 仍允許手動拉高 */
+  line-height: 1.6;
+}
+/* ===== Add Expense Modal footer (center scan, right save) ===== */
+.expenseAddFooter{
+  display: grid;
+  grid-template-columns: 1fr 44px 1fr; /* 左留白 / 中掃描 / 右新增 */
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.scanIconBtn{
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 14px;
+
+  border: 1px solid rgba(124,110,230,.28);
+  background: rgba(124,110,230,.12);
+  color: rgba(60,50,140,.9);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 900;
+
+  -webkit-tap-highlight-color: transparent;
+}
+.scanIconBtn:hover{
+  background: rgba(124,110,230,.16);
+  border-color: rgba(124,110,230,.38);
+}
+.scanIconBtn:active{
+  background: rgba(124,110,230,.20);
+}
+
+/* 新增按鈕靠右 */
+.expenseAddSaveBtn{
+  justify-self: end;
+  width: auto;            /* 不要撐滿整行 */
+  padding: 12px 16px;
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* 掃描中：只轉 icon，不轉按鈕框 */
+.scanIconBtn .scanIcon{
+  display: inline-block; /* 讓 transform 生效 */
+}
+
+.scanIconBtn.isSpinning .scanIcon{
+  animation: spin 1.2s linear infinite;
+}
+.modalX{
+  appearance: none;
+  border: 0;
+  background: transparent;   /* ✅ 沒有背景 */
+  box-shadow: none;
+  padding: 6px 8px;          /* 點擊範圍夠大 */
+  cursor: pointer;
+
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+  color: rgba(0,0,0,.45);
+}
+.modalX:hover{ color: rgba(0,0,0,.70); }
+.modalX:active{ color: rgba(0,0,0,.85); }
+
+/* 純顯示版：分類 icon 的外觀（沿用原本分類欄尺寸） */
+.expCatStatic{
+  width: 32px;
+  height: 36px;
+  display: block;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.85);
+  border-radius: 10px;
+
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 36px;
+  text-align: center;
+}
+
+/* 純顯示版：付款人角標（不是按鈕，只是顯示） */
+.expPayerBadge{
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  opacity: .7;
+  pointer-events: none;
+}
+
+/* 讓整列看起來可點 */
+.expRow{ cursor: pointer; }
+.expRow .expDelBtn{ cursor: pointer; }
+
+/* ✅ Spot modal 大圖：完整顯示，不裁切 */
+#spotPhotoWall.photoWall{
+  height: auto;              /* ✅ 不要固定 240px */
+  aspect-ratio: 4 / 3;       /* ✅ 預設比例（圖片 load 後會被 JS 覆蓋成真實比例） */
+  max-height: 70vh;          /* ✅ 避免長圖把 modal 撐爆 */
+  background: rgba(0,0,0,.04);
+}
+
+#spotPhotoWall.photoWall img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;       /* ✅ 關鍵：完整顯示 */
+  background: rgba(0,0,0,.04);
+}
+
+/* ===== Thumb crop modal ===== */
+.modal--thumbCrop{
+  width: min(440px, 92vw);
+  max-height: 70dvh;
+  border-radius: 14px;
+}
+
+.thumbCropViewport{
+  width: 100%;
+  aspect-ratio: 4 / 3;              /* 跟你的縮圖 72x54 一樣比例 */
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,.06);
+  overflow: hidden;
+
+  /* 用 background 來做「cover 裁切 + 拖曳」 */
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50% 50%;
+
+  touch-action: none;               /* ✅ 讓拖曳不被頁面滾動吃掉 */
+  user-select: none;
+  position: relative;
+}
+
+/* 可選：加個淡淡的格線，幫助定位 */
+.thumbCropViewport::after{
+  content:"";
+  position:absolute; inset:0;
+  background:
+    linear-gradient(to right, rgba(255,255,255,.25) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,.25) 1px, transparent 1px);
+  background-size: 33.33% 100%, 100% 33.33%;
+  pointer-events:none;
+  opacity:.35;
+}
+
+.thumbCropFooter{
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  margin-top: 12px;
+  align-items: center;
+}
+
+
+</style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="topDock">
+        <div class="sideHero" id="sideHero">
+          <div class="sideHeroOverlay"></div>
+          <div class="sideTop">
+            <div class="title">
+              <div id="tripTitleLabel">旅遊筆記</div>
+              <div class="badge" id="saveBadge">載入中…</div>
+            </div>
+
+            <div class="row topActions" style="margin-top:10px">
+						  <button class="bellBtn" id="btnEnablePush" type="button" aria-label="通知"></button>
+						</div>
+
+            <div style="margin-top:10px">
+              <input class="input" id="search" placeholder="搜尋（跨天搜尋：地點/心得/待辦/花費）" />
+            </div>
+          </div>
+        </div>
+
+        <!-- iOS fixed fallback spacer -->
+        <div class="dayDockSpacer" id="dayDockSpacer" aria-hidden="true"></div>
+
+        <div class="dayDock" id="dayDock">
+          <div class="dayList" id="dayList"></div>
+          <div class="dayDockFab" aria-label="記帳快捷">
+				    <button class="dayDockFabBtn" id="fabExpense" type="button" title="記帳">💰</button>
+				  </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="grid">
+        <!-- Left -->
+        <section class="card">
+          <h2>
+            <span id="dayHeader">載入中…</span>
+            <span class="pill dayPillWrap">
+					    <span id="dayPill">點我設定日期</span>
+					    <input type="date" id="dayDatePicker" class="dayDateOverlay" />
+					  </span>
+          </h2>
+
+          <details class="metaPanel" id="metaPanel" open>
+            <summary>
+              <span>基本資訊（主題／住宿）</span>
+              <span class="metaSummaryRight" id="metaSummaryRight">點擊收合</span>
+            </summary>
+
+            <div class="kvs" style="margin-top:10px">
+              <div class="k">城市/主題</div>
+              <div><input class="input" id="dayTheme" placeholder="例如：札幌｜甜點散步＋夜景" /></div>
+
+              <div class="k">住宿</div>
+              <div class="stayWrap">
+                <input class="input" id="dayStay"  />
+
+                <div class="stayPhoto" id="stayPhotoBox" title="點擊看大圖">
+                  <div class="stayPhotoPlaceholder" id="stayPhotoPlaceholder">住宿照片<br>（最多 1 張）</div>
+                  <img id="stayPhotoImg" alt="stay" style="display:none" />
+                  <div class="stayPhotoTools">
+                    <label class="miniBtn" title="上傳/更換住宿照片">
+                      上傳
+                      <input type="file" accept="image/*" id="stayPhotoInput" style="display:none" />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <h3>景點</h3>
+          <div class="spotList" id="spotList"></div>
+
+          <h3>今日回顧</h3>
+
+					<div class="notesField">
+					  <div class="notesTabs notesTabs--overlay" id="notesTabs">
+					    <button class="notesTab active" type="button" data-notes-role="J">💪</button>
+					    <button class="notesTab" type="button" data-notes-role="V">🐽</button>
+					  </div>
+
+					  <textarea id="dayNotes" class="notesTa" placeholder="今日回顧（J）"></textarea>
+					</div>
+
+        </section>
+
+        <!-- Right -->
+        <section>
+          <div class="desktopCards">
+            <!-- 花費先、待辦後 -->
+            <div class="card card--side" id="expenseCard">
+              <h2 class="cardHeadRow">
+							  <span class="titleTag">花費記錄</span>
+
+							  <div class="cardHeadActions">
+							    <span class="muted">幣別</span>
+							    <input class="input currencyInput" id="currency" placeholder="幣別" />
+							    <button class="btn primary" id="btnAddExpense">＋新增</button>
+							  </div>
+							</h2>
+
+              <!-- 分類統計（點 pill 篩選清單） -->
+              <div class="expenseTopBar">
+                <div class="sumRow" id="expenseSums"></div>
+              </div>
+							<div class="expTableWrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="expColCat">分類</th>
+                    <th>項目名稱</th>
+                    <th class="right expColAmt">金額</th>
+                    <th class="expColDel">
+										  <span class="expSortWrap" title="排序">
+										    <span class="expSortBtn" aria-hidden="true">⇅</span>
+										    <select id="expenseSort" class="expSortSelect" aria-label="花費排序">
+										      <option value="amtDesc">從最貴</option>
+										      <option value="amtAsc">從最便宜</option>
+										      <option value="new" selected>新到舊</option>
+										      <option value="old">舊到新</option>
+										    </select>
+										  </span>
+										</th>
+                  </tr>
+                </thead>
+                <tbody id="expenseBody"></tbody>
+              </table>
+            </div>
+            </div>
+
+            <div class="card card--side" id="todoCard" style="margin-top:14px">
+              <h2 class="cardHeadRow">
+							  <span class="titleTag">待辦清單</span>
+							  <div class="cardHeadActions">
+							    <button class="btn primary" id="btnAddTodo" type="button">＋新增</button>
+							  </div>
+							</h2>
+              <div class="todoTabs" id="todoTabs"></div>
+              <div class="checklist" id="todoList"></div>
+            </div>
+          </div>
+
+          <div class="mobileAccordions">
+            <details class="accordion" id="expenseDetails" open>
+						  <summary class="accSummary">
+						    <span class="accTitle">
+						      💲 花費記錄 <span id="expenseTitleSum_m" class="expenseTitleSum"></span>
+						    </span>
+
+						    <span class="accRight">
+						      <span class="muted">幣別</span>
+						      <input class="input accCurrencyInput" id="currency_m" placeholder="幣別" />
+						      <button class="btn primary accAddBtn" id="btnAddExpense_m" type="button">+</button>
+						      
+						    </span>
+						  </summary>
+
+						  <div class="content">
+						    <div class="expenseTopBar">
+						      <div class="sumRow" id="expenseSums_m"></div>
+						    </div>
+
+						    <div class="expTableWrap">
+						      <table>
+						        <thead>
+						          <tr>
+						            <th class="expColCat">分類</th>
+						            <th>項目名稱</th>
+						            <th class="right expColAmt">金額</th>
+						            <th class="expColDel">
+						              <span class="expSortWrap" title="排序">
+						                <span class="expSortBtn" aria-hidden="true">⇅</span>
+						                <select id="expenseSort_m" class="expSortSelect" aria-label="花費排序">
+						                  <option value="amtDesc">從最貴</option>
+						                  <option value="amtAsc">從最便宜</option>
+						                  <option value="new" selected>新到舊</option>
+						                  <option value="old">舊到新</option>
+						                </select>
+						              </span>
+						            </th>
+						          </tr>
+						        </thead>
+						        <tbody id="expenseBody_m"></tbody>
+						      </table>
+						    </div>
+						  </div>
+						</details>
+
+            <details class="accordion" id="todoDetails">
+						  <summary class="accSummary">
+							  <span class="accTitle">📝 待辦清單</span>
+							  <span class="accRight">
+							    <button class="btn primary accAddBtn" id="btnAddTodo_m" type="button">+</button>
+							    
+							  </span>
+							</summary>
+
+						  <div class="content">
+
+						    <div class="todoTabs" id="todoTabs_m"></div>
+						    <div class="checklist" id="todoList_m"></div>
+
+						  
+						  </div>
+						</details>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- FAB: only expense 
+    <div class="fab" aria-label="快捷功能">
+      <button class="fabBtn" id="fabExpense" type="button" title="記帳">💰</button>
+    </div>-->
+  </div>
+
+  <!-- Spot Modal -->
+  <div class="modalMask" id="spotMask" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modalHead">
+        <div class="modalTitle" id="spotModalTitle">景點</div>
+        <button class="btn" type="button" id="spotClose">完成</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="spotModalGrid">
+          <div>
+            <div class="k" style="margin-bottom:6px">地點名稱</div>
+            <input class="input" id="spotTitleInput"/>
+          </div>
+
+          <div class="photoWall" id="spotPhotoWall" title="點擊看大圖">
+            <div class="photoWallPh" id="spotPhotoPh">景點照片（最多 1 張）</div>
+            <img id="spotPhotoImg" alt="spot" style="display:none" />
+            <div class="photoWallTools">
+            	<button class="miniBtn" type="button" id="spotThumbAdjustBtn">縮圖</button>
+              <label class="miniBtn">
+                上傳
+                <input type="file" accept="image/*" id="spotPhotoInput" style="display:none" />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:10px" class="commentBox">
+          <div class="commentList" id="commentList"></div>
+
+          <div class="commentInputRow">
+            <select class="roleJV" id="commentRole" aria-label="選擇留言角色">
+              <option value="J">💪</option>
+              <option value="V">🐽</option>
+            </select>
+            <textarea class="commentTa" id="commentText" placeholder="留言板"></textarea>
+          </div>
+
+          <div class="row" style="justify-content:flex-end;">
+            <button class="btn primary" id="commentSend" type="button">送出</button>
+          </div>
+        </div>
+        <!-- ✅ Spot modal bottom bar（左下角刪除） -->
+				<div class="spotBottomBar">
+				  <button class="trashIconBtn" type="button" id="spotDelete" aria-label="刪除此景點" title="刪除此景點">
+				    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				      <path d="M3 6h18"></path>
+				      <path d="M8 6V4h8v2"></path>
+				      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+				      <path d="M10 11v6"></path>
+				      <path d="M14 11v6"></path>
+				    </svg>
+				  </button>
+				</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="modalMask" id="imgMask" aria-hidden="true">
+    <div class="modal" style="background:#000;border-color:#000;">
+      <div class="modalHead" style="border-bottom-color: rgba(255,255,255,.15); background:#000;">
+        <div class="modalTitle" style="color:#fff;">查看圖片</div>
+        <button class="btn" type="button" id="imgClose">關閉</button>
+      </div>
+      <div class="modalBody" style="background:#000;padding:0;">
+        <img id="imgPreview" class="lightboxImg" alt="preview" />
+      </div>
+    </div>
+  </div>
+  
+  <!-- Todo Category Modal -->
+	<div class="modalMask" id="todoCatMask" aria-hidden="true">
+	  <div class="modal modal--todoCat" role="dialog" aria-modal="true">
+	    <div class="modalHead">
+	      <div class="modalTitle">編輯分類</div>
+	    </div>
+
+	    <div class="modalBody">
+			  <div class="k todoCatLabel">分類</div>
+			  <input class="input" id="todoCatName" />
+
+			  <div class="todoCatFooter">
+			    <button class="todoCatDelIconBtn" type="button" id="todoCatDelete" aria-label="刪除分類" title="刪除">
+			      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			        <path d="M3 6h18"></path>
+			        <path d="M8 6V4h8v2"></path>
+			        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+			        <path d="M10 11v6"></path>
+			        <path d="M14 11v6"></path>
+			      </svg>
+			    </button>
+
+			    <button class="btn primary todoCatSaveBtn" type="button" id="todoCatSave">儲存</button>
+
+			    <div aria-hidden="true"></div>
+			  </div>
+			</div>
+	  </div>
+	</div>
+	
+	<div class="modalMask" id="expenseCatMask" aria-hidden="true">
+	  <div class="modal modal--todoCat" role="dialog" aria-modal="true">
+	    <div class="modalHead">
+	      <div class="modalTitle">編輯花費分類</div>
+	    </div>
+
+	    <div class="modalBody">
+			  <div class="expCatForm">
+			    <div class="k">分類名稱</div>
+			    <input class="input" id="expenseCatName" />
+
+			    <div class="k">Icon</div>
+			    <input class="input" id="expenseCatIcon" />
+			  </div>
+
+			  <div class="expCatFooter">
+			    <button class="expCatDelIconBtn" type="button" id="expenseCatDelete" aria-label="刪除分類" title="刪除">
+			      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			        <path d="M3 6h18"></path>
+			        <path d="M8 6V4h8v2"></path>
+			        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+			        <path d="M10 11v6"></path>
+			        <path d="M14 11v6"></path>
+			      </svg>
+			    </button>
+
+			    <button class="btn primary expCatSaveBtn" type="button" id="expenseCatSave">儲存</button>
+
+			    <div aria-hidden="true"></div>
+			  </div>
+			</div>
+	  </div>
+	</div>
+	
+	<div class="dayCtxMenu" id="dayCtxMenu" aria-hidden="true">
+	  <button type="button" id="dayCtxRename">編輯名稱</button>
+	  <button type="button" id="dayCtxDelete" class="danger">刪除此天</button>
+	</div>
+	
+	<!-- Add Expense Modal -->
+	<div class="modalMask" id="expenseAddMask" aria-hidden="true">
+	  <div class="modal modal--todoCat" role="dialog" aria-modal="true">
+	    <div class="modalHead">
+	      <div class="modalTitle">新增花費</div>
+	      <button class="modalX" type="button" id="expenseAddClose" aria-label="關閉">✕</button>
+	    </div>
+
+	    <div class="modalBody">
+	      <div class="expCatForm">
+	        <div class="k">分類</div>
+	        <select class="input" id="expenseAddCat"></select>
+
+	        <div class="k">付款人</div>
+	        <select class="input" id="expenseAddPayer">
+	          <option value="J">💪</option>
+	          <option value="V">🐽</option>
+	        </select>
+
+	        <div class="k">項目</div>
+	        <input class="input" id="expenseAddName" placeholder="例如：LAWSON｜收據" />
+
+	        <div class="k">金額</div>
+	        <input class="input" id="expenseAddAmt" inputmode="decimal" placeholder="0" />
+	        <div class="k">明細</div>
+					<textarea class="input expenseDetailsTa" id="expenseAddDetails"></textarea>
+	      </div>
+
+	      <div class="expenseAddFooter">
+				  <div aria-hidden="true"></div>
+
+				  <button class="scanIconBtn" type="button" id="expenseScanBtn" title="掃描收據" aria-label="掃描收據">
+					  <span class="scanIcon">📷</span>
+					</button>
+
+				  <button class="btn primary expenseAddSaveBtn" type="button" id="expenseAddSave">新增</button>
+				</div>
+
+	      <!-- hidden file input for receipt -->
+	      <!--<input id="expenseReceiptInput" type="file" accept="image/*"  style="display:none" /> -->
+	      <input id="expenseReceiptInput" type="file" accept="image/*" capture="environment" style="display:none" /> 
+	    </div>
+	  </div>
+	</div>
+	
+	<!-- Thumb Crop Modal -->
+	<div class="modalMask" id="thumbCropMask" aria-hidden="true">
+	  <div class="modal modal--thumbCrop" role="dialog" aria-modal="true">
+	    <div class="modalHead">
+	      <div class="modalTitle">調整清單縮圖位置</div>
+	      <button class="modalX" type="button" id="thumbCropClose" aria-label="關閉">✕</button>
+	    </div>
+
+	    <div class="modalBody">
+	      <div class="thumbCropViewport" id="thumbCropViewport" aria-label="縮圖預覽區"></div>
+	      <div class="k" style="margin-top:8px;">決定清單縮圖顯示的位置</div>
+
+	      <div class="thumbCropFooter">
+	        <button class="btn" type="button" id="thumbCropReset">置中</button>
+	        <div aria-hidden="true"></div>
+	        <button class="btn primary" type="button" id="thumbCropSave">儲存</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+		
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import Sortable from "https://esm.sh/sortablejs@1.15.2";
+/* ===== Supabase 設定 ===== */
+const SUPABASE_URL = "https://kskxjbzeokraeterqzzc.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtza3hqYnplb2tyYWV0ZXJxenpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDgyMDgsImV4cCI6MjA5NzgyNDIwOH0.bUmpIha1cpKIAGjD4Dvrmf0c44zYRmguigcf9N73BDk";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const BUCKET = "TripCard-photo";
+const params = new URLSearchParams(location.search);
+const tripId = params.get("trip");
+
+// --- read can_edit from index ---
+const canEditParam = params.get("can_edit"); // "1" or "0"
+let CAN_EDIT =
+  canEditParam === "1" ||
+  (canEditParam == null && sessionStorage.getItem("can_edit") === "1");
+
+// persist for refresh/back-forward cache
+sessionStorage.setItem("can_edit", CAN_EDIT ? "1" : "0");
+
+const $ = (id) => document.getElementById(id);
+const uid = () => crypto.randomUUID();
+
+const state = {
+  tripMeta: null,
+  data: null,
+  activeDayId: null,
+  saveTimer: null,
+  activeSpotId: null,
+  spotSortable: null,
+  editingTodoCatId: null,
+  editingExpenseCatId: null,
+  editingExpenseId: null,
+  thumbCrop: null,
+  expenseFilter: "all", 
+  todoFilter: "all",
+  notesRole: "J",
+  expenseSort: "new",
+  currency: "JPY",
+  expenses: []
+};
+
+let lastReadonlyWarnAt = 0;
+const PUSH_WORKER = "https://trip-plan-push.johnnydx72870820.workers.dev";
+
+// ===== Edit permission via Worker (global) =====
+function getDeviceId(){
+  let id = localStorage.getItem("device_id");
+  if(!id){
+    id = crypto.randomUUID();
+    localStorage.setItem("device_id", id);
+  }
+  return id;
+}
+
+async function canEditFromWorker(){
+  const deviceId = getDeviceId();
+  const res = await fetch(`${PUSH_WORKER}/api/edit/can-edit`, {
+    method: "POST",
+    headers: { "content-type":"application/json" },
+    body: JSON.stringify({ deviceId })
+  });
+  const data = await res.json().catch(()=>({}));
+  return !!data?.canEdit;
+}
+
+async function unlockByWorker(password){
+  const deviceId = getDeviceId();
+  const res = await fetch(`${PUSH_WORKER}/api/edit/unlock`, {
+    method: "POST",
+    headers: { "content-type":"application/json" },
+    body: JSON.stringify({ deviceId, password })
+  });
+  const data = await res.json().catch(()=>({}));
+  return !!data?.canEdit;
+}
+
+function setReadonlyMode(on){
+  // on=true: disable edit UI
+  const ro = !!on;
+
+  // 允許搜尋
+  document.querySelectorAll("input, textarea").forEach(el => {
+    if(el.id === "search") return;
+    // date 在 iOS readonly 不穩，直接 disabled
+    if(el.type === "date") { el.disabled = ro; return; }
+    el.readOnly = ro;
+  });
+
+  document.querySelectorAll("select").forEach(el => el.disabled = ro);
+
+  // 上傳 input
+  ["stayPhotoInput","spotPhotoInput"].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.disabled = ro;
+  });
+
+  // 主要新增按鈕（存在的話）
+  ["btnAddTodo","btnAddTodo_m","btnAddExpense","btnAddExpense_m","fabExpense","commentSend"].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.disabled = ro;
+  });
+
+  // 你也可以選擇把 badge 顯示成唯讀
+  const badge = document.getElementById("saveBadge");
+  if(badge && ro) badge.textContent = "唯讀";
+}
+
+async function requireEdit(actionName="編輯"){
+  if(CAN_EDIT) return true;
+
+  const now = Date.now();
+  if(now - lastReadonlyWarnAt < 800) return false;
+  lastReadonlyWarnAt = now;
+
+  const wantUnlock = confirm(`目前是唯讀模式，無法${actionName}。\n\n要輸入密碼解鎖嗎？\n（取消=只瀏覽）`);
+  if(!wantUnlock) return false;
+
+  const pw = prompt("輸入密碼", "");
+  if(pw === null) return false;
+
+  const ok = await unlockByWorker(pw);
+	if(ok){
+	  CAN_EDIT = true;
+	  sessionStorage.setItem("can_edit", "1");
+	  setReadonlyMode(false);
+	  alert("已解鎖，可開始編輯");
+	  return true;
+	}else{
+    alert("密碼錯誤，維持唯讀");
+    return false;
+  }
+}
+
+function escapeHtml(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+function escapeAttr(s){ return escapeHtml(s).replaceAll("\n"," "); }
+function formatNumber(n){
+  try{ return new Intl.NumberFormat().format(n); }catch{ return String(n); }
+}
+
+/* ===== 日期：資料存 ISO，顯示 7/10（五） ===== */
+const WEEK_ZH = ["日","一","二","三","四","五","六"];
+function pad2(n){ return String(n).padStart(2,"0"); }
+function isoToDate(iso){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(iso||""))) return null;
+  const d = new Date(iso + "T00:00:00");
+  return isNaN(d.getTime()) ? null : d;
+}
+function dateToISO(d){
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+}
+function formatDisplayDate(iso){
+  const d = isoToDate(iso);
+  if(!d) return "";
+  const m = d.getMonth() + 1;
+  const day = d.getDate();
+  const wk = WEEK_ZH[d.getDay()];
+  return `${m}/${day}（${wk}）`;
+}
+
+function addDays(dateObj, days){
+  const d = new Date(dateObj);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+
+/* ✅ 以 Day1 為基準，自動填入後續日期（只更新 date_auto=true 的天） */
+function autoFillDatesFromDay1(){
+  const days = state.data?.days || [];
+  if(days.length === 0) return;
+
+  const base = isoToDate(days[0].date);
+  if(!base) return;
+
+  for(let i=0; i<days.length; i++){
+    const day = days[i];
+    if(day.date_auto === true || !String(day.date||"").trim()){
+      day.date = dateToISO(addDays(base, i));
+      day.date_auto = true;
+    }
+  }
+}
+
+// ✅ 日期用原生 date picker（預設：若沒日期 → 今天）
+const dayDatePicker = $("dayDatePicker");
+let pendingDayId = null;
+
+// ✅ Header 的日期 pill：點開 date picker 前先綁定 pendingDayId
+dayDatePicker.addEventListener("pointerdown", () => {
+  const d = activeDay();
+  if(!d) return;
+
+  pendingDayId = d.id;
+
+  const todayISO = dateToISO(new Date());
+  dayDatePicker.value =
+    (d.date && /^\d{4}-\d{2}-\d{2}$/.test(d.date)) ? d.date : todayISO;
+}, { capture:true });
+
+function editDayDate(dayId){
+  const day = state.data.days.find(x => x.id === dayId);
+  if(!day) return;
+
+  pendingDayId = dayId;
+
+  // 有日期用既有日期，沒日期預設今天
+  const todayISO = dateToISO(new Date());
+  dayDatePicker.value = (day.date && /^\d{4}-\d{2}-\d{2}$/.test(day.date)) ? day.date : todayISO;
+
+  // 叫出原生日期視窗（支援 showPicker 的瀏覽器會更穩）
+  if(dayDatePicker.showPicker) dayDatePicker.showPicker();
+  else dayDatePicker.click();
+}
+
+// 選好日期後回寫
+dayDatePicker.addEventListener("change", async () => {
+  if(!await requireEdit("修改日期")){
+    pendingDayId = null;
+    return;
+  }  
+  
+  if(!pendingDayId) return;
+
+  const day = state.data.days.find(x => x.id === pendingDayId);
+  if(!day) return;
+
+  const picked = dayDatePicker.value; // yyyy-mm-dd
+  if(!picked) return;
+
+  day.date = picked;
+  day.date_auto = false;
+
+  // 若改 Day1 → 後面自動日期重算（只覆蓋 date_auto=true 的天）
+  if(state.data.days[0]?.id === pendingDayId){
+    autoFillDatesFromDay1();
+  }
+
+  pendingDayId = null;
+  await saveToDb(true);
+  renderAll();
+});
+
+// 取消選擇時通常不會觸發 change，但保險清掉 pending
+dayDatePicker.addEventListener("blur", () => {
+  pendingDayId = null;
+});
+
+const isMobile = () => window.matchMedia("(max-width: 900px)").matches;
+
+function getTopCoverOffset(){
+  const dock = $("dayDock");
+  const h = dock ? dock.getBoundingClientRect().height : 0;
+  return h + 12; // 再加一點 padding
+}
+
+function revealElement(el){
+  if(!el) return;
+
+  const offset = isMobile() ? getTopCoverOffset() : 0;
+  const rect = el.getBoundingClientRect();
+
+  const vvH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+
+  // 目標：讓 input 顯示在 dayDock 下方一點點
+  const targetTop = window.scrollY + rect.top - offset - 12;
+
+  // 防止捲到超過頁底
+  const maxTop = Math.max(0, document.documentElement.scrollHeight - vvH);
+
+  window.scrollTo({
+    top: Math.max(0, Math.min(maxTop, targetTop)),
+    behavior: "auto"
+  });
+}
+
+function focusAndSelect(el){
+  if(!el) return;
+
+  // 1) focus 但不要讓瀏覽器自動 scroll（避免 iOS 自己多捲）
+  try{
+    el.focus({ preventScroll: true });
+  }catch{
+    el.focus();
+  }
+
+  // 2) 先做一次定位（有些機型 visualViewport 不會 resize）
+  requestAnimationFrame(() => revealElement(el));
+
+  // 3) 等鍵盤導致 viewport resize「穩定」後，再做最後一次定位（只一次）
+  if(isMobile() && window.visualViewport){
+    const vv = window.visualViewport;
+    let timer = null;
+
+    const onResize = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        vv.removeEventListener("resize", onResize);
+        revealElement(el);
+      }, 80); // 等 resize 事件停止
+    };
+
+    vv.addEventListener("resize", onResize, { passive:true });
+
+    // 保險：最多等 500ms，避免 listener 一直掛著
+    setTimeout(() => vv.removeEventListener("resize", onResize), 500);
+  }
+
+  // 4) 選取文字
+  setTimeout(() => el.select?.(), 0);
+}
+function pickVisible(selector){
+  const els = Array.from(document.querySelectorAll(selector));
+  return els.find(el => el.offsetParent !== null && el.getClientRects().length) || null;
+}
+
+function getDefaultTodoCatId(){
+  return state.data?.todoCategories?.[0]?.id || null;
+}
+
+function ensureTodoFilterValid(){
+  if(state.todoFilter === "all") return;
+  const ok = (state.data?.todoCategories || []).some(c => c.id === state.todoFilter);
+  if(!ok) state.todoFilter = "all";
+}
+
+function calcTodoCounts(){
+  const counts = new Map();
+  const todos = state.data?.tripTodos || [];
+  const fallback = getDefaultTodoCatId();
+
+  for(const t of todos){
+    if(t.done) continue; // ✅ 只算未打勾
+    const cid = t.categoryId || fallback;
+    if(!cid) continue;
+    counts.set(cid, (counts.get(cid) || 0) + 1);
+  }
+  return counts;
+}
+
+
+async function deleteTodoCategory(catId){
+	
+	if(!await requireEdit("刪除分類")) return;
+	
+  const cats = state.data?.todoCategories || [];
+  if(cats.length <= 1){
+    alert("至少要保留 1 個分類");
+    return;
+  }
+
+  const idx = cats.findIndex(c => c.id === catId);
+  if(idx < 0) return;
+
+  const cat = cats[idx];
+  if(!confirm(`確定刪除分類「${cat.name}」？\n此分類的待辦會移到另一個分類。`)) return;
+
+  // fallback：找一個不是自己且存在的分類
+  const fallback = cats.find(c => c.id !== catId)?.id;
+  if(!fallback){
+    alert("至少要保留 1 個分類");
+    return;
+  }
+
+  // 把該分類 todo 轉移
+  for(const t of (state.data.tripTodos || [])){
+    if(t.categoryId === catId) t.categoryId = fallback;
+  }
+
+  // 刪分類
+  cats.splice(idx, 1);
+
+  // 若當前正在看被刪掉的 tab → 回到 all
+  if(state.todoFilter === catId) state.todoFilter = "all";
+
+  saveToDb(true);
+  renderTodoTabs();
+  renderTodos();
+}
+async function deleteTodoById(todoId){
+	
+	if(!await requireEdit("刪除待辦")) return;
+	
+  const i = (state.data.tripTodos || []).findIndex(t => t.id === todoId);
+  if(i < 0) return;
+
+  state.data.tripTodos.splice(i, 1);
+  saveToDb(true);
+  renderTodos();
+}
+
+ 
+
+function renderTodoTabs(){
+  ensureTodoFilterValid();
+
+  const cats = state.data?.todoCategories || [];
+  const counts = calcTodoCounts();
+
+  const build = (el) => {
+    if(!el) return;
+
+    el.innerHTML = `
+      <div class="todoTab ${state.todoFilter === "all" ? "active" : ""}" data-todo-tab="all">全部</div>
+      ${cats.map(c => `
+        <div class="todoTab ${state.todoFilter === c.id ? "active" : ""}"
+             data-todo-tab="${escapeAttr(c.id)}"
+             data-todo-cat-id="${escapeAttr(c.id)}">
+          ${escapeHtml(c.name || "未命名")}
+          <span class="todoTabCount">${counts.get(c.id) || 0}</span>
+        </div>
+      `).join("")}
+      <div class="todoTab add" data-todo-tab-add>＋</div>
+    `;
+  };
+
+  build($("todoTabs"));
+  build($("todoTabs_m"));
+}
+
+function setTodoFilter(next){
+  state.todoFilter = next || "all";
+  renderTodoTabs();
+  renderTodos();
+}
+
+async function addTodoCategory(){
+	
+	if(!await requireEdit("新增分類")) return;
+	
+  const v = prompt("新增分類名稱", "");
+  if(v === null) return;
+  const name = v.trim();
+  if(!name) return;
+
+  const id = uid();
+  state.data.todoCategories ||= [];
+  state.data.todoCategories.push({ id, name });
+
+  state.todoFilter = id;
+  saveToDb(true);
+  renderTodoTabs();
+  renderTodos();
+}
+function openTodoCatEditor(catId){
+  const cat = (state.data?.todoCategories || []).find(c => c.id === catId);
+  if(!cat) return;
+
+  state.editingTodoCatId = catId;
+
+  const mask = $("todoCatMask");
+  const input = $("todoCatName");
+
+  input.value = cat.name || "";
+  mask.style.display = "flex";
+  mask.setAttribute("aria-hidden", "false");
+
+  // 聚焦＋全選
+  setTimeout(() => {
+    try{ input.focus({ preventScroll:true }); }catch{ input.focus(); }
+  }, 50);
+}
+
+function closeTodoCatEditor(){
+  state.editingTodoCatId = null;
+  const mask = $("todoCatMask");
+  mask.style.display = "none";
+  mask.setAttribute("aria-hidden", "true");
+  $("todoCatName").value = "";
+}
+
+// ✅ 取代你原本那個 prompt 版本 editTodoCategory
+function editTodoCategory(catId){
+  openTodoCatEditor(catId);
+}
+
+  
+function initTodoTabUIOnce(){
+  const bindRoot = (root) => {
+    if(!root) return;
+    if(root.dataset.bound === "1") return;
+    root.dataset.bound = "1";
+
+    let timer = null;
+    let longPressed = false;
+    let pressedCatId = null;
+
+    const clear = () => {
+      if(timer){
+        clearTimeout(timer);
+        timer = null;
+      }
+      pressedCatId = null;
+    };
+
+    const startPress = (e) => {
+      const tab = e.target?.closest?.(".todoTab[data-todo-cat-id]");
+      if(!tab || !root.contains(tab)) return;
+
+      longPressed = false;
+      pressedCatId = tab.dataset.todoCatId;
+
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+			  longPressed = true;
+
+			  // ✅ 清掉可能已經產生的文字選取（避免長按時把字反白）
+			  const sel = window.getSelection?.();
+			  if(sel && sel.removeAllRanges) sel.removeAllRanges();
+
+			  editTodoCategory(pressedCatId);
+			  clear();
+			}, 550);
+
+    };
+
+    const cancelPress = () => clear();
+
+    // 長按偵測（不要 preventDefault，避免影響滾動/點擊）
+    root.addEventListener("touchstart", startPress, { passive:true });
+    root.addEventListener("touchend", cancelPress, { passive:true });
+    root.addEventListener("touchcancel", cancelPress, { passive:true });
+    root.addEventListener("touchmove", cancelPress, { passive:true });
+
+    root.addEventListener("pointerdown", startPress, { passive:true });
+    root.addEventListener("pointerup", cancelPress, { passive:true });
+    root.addEventListener("pointercancel", cancelPress, { passive:true });
+    root.addEventListener("pointermove", cancelPress, { passive:true });
+
+    // 點一下切換/新增（長按觸發後會把 click 吃掉）
+    root.addEventListener("click", (e) => {
+      const add = e.target.closest(".todoTab[data-todo-tab-add]");
+      if(add && root.contains(add)){
+        if(longPressed){ longPressed = false; return; }
+        addTodoCategory();
+        return;
+      }
+
+      const tab = e.target.closest(".todoTab[data-todo-tab]");
+      if(!tab || !root.contains(tab)) return;
+
+      if(longPressed){
+        longPressed = false;
+        return;
+      }
+
+      const id = tab.dataset.todoTab;
+      if(!id) return;
+      setTodoFilter(id);
+    });
+  };
+
+  bindRoot($("todoTabs"));
+  bindRoot($("todoTabs_m"));
+}
+
+function defaultNotebook(title="我的旅遊筆記"){
+  return {
+    tripTitle: title,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    tripTodos: [],
+    todoCategories: [
+		  { id: uid(), name: "📝" },
+		  { id: uid(), name: "🍽️" },
+		  { id: uid(), name: "🛍️" }
+		],
+		expenseCategories: [
+		  { id: uid(), name: "餐飲", icon: "🍜" },
+		  { id: uid(), name: "購物", icon: "🛍️" },
+		  { id: uid(), name: "お土産", icon: "🎁" },
+		  { id: uid(), name: "甜點", icon: "🍰" },
+		  { id: uid(), name: "娛樂", icon: "🕹️" }
+		],
+    days: [{
+      id: uid(),
+      name: "Day 1",
+      date: "",
+      date_auto: true,
+      theme: "",
+      stay: "",
+      stay_photo_path: "",
+      stay_photo_updated_at: "",
+      spots: [],
+      notes: ""
+    }]
+  };
+}
+
+/* ===== 封面 ===== */
+
+function getPublicUrl(path, v=""){
+  if(!path) return "";
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+  return data.publicUrl + (v ? `?v=${encodeURIComponent(v)}` : "");
+}
+function setCover(){
+  const hero = $("sideHero");
+  if(!hero) return;
+  const url = getPublicUrl(state.tripMeta?.header_path, state.tripMeta?.updated_at || "");
+  hero.style.backgroundImage = url ? `url('${url}')` : "";
+}
+
+/* ===== Image to jpeg ===== */
+async function fileToJpegBlob(file, maxW = 1600, quality = 0.85){
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = reject;
+    i.src = URL.createObjectURL(file);
+  });
+
+  const scale = Math.min(1, maxW / img.naturalWidth);
+  const w = Math.round(img.naturalWidth * scale);
+  const h = Math.round(img.naturalHeight * scale);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0, w, h);
+
+  return await new Promise((resolve) => {
+    canvas.toBlob((b) => resolve(b), "image/jpeg", quality);
+  });
+}
+async function uploadJpegToStorage(path, blob){
+  const { error } = await supabase.storage.from(BUCKET).upload(path, blob, {
+    upsert: true,
+    cacheControl: "3600",
+    contentType: "image/jpeg"
+  });
+  if(error) throw error;
+}
+async function removePaths(paths){
+  const clean = (paths || []).filter(Boolean);
+  if(!clean.length) return;
+
+  const { error } = await supabase.storage.from(BUCKET).remove(clean);
+  if(error){
+    // 不要阻擋流程（常見是權限不足 / 檔不存在）
+    console.warn("storage.remove failed:", error.message || error);
+  }
+}
+
+async function removeFolder(prefix){
+  // Supabase Storage 沒有「刪資料夾」，要先 list 裡面的檔再 remove
+  try{
+    const { data, error } = await supabase.storage
+      .from(BUCKET)
+      .list(prefix, { limit: 1000 });
+
+    if(error){
+      console.warn("storage.list failed:", error.message || error);
+      return;
+    }
+    if(!data?.length) return;
+
+    const paths = data
+      .filter(x => x?.name)
+      .map(x => `${prefix}/${x.name}`);
+
+    await removePaths(paths);
+  }catch(e){
+    console.warn("removeFolder exception:", e);
+  }
+}
+
+/* ===== normalize ===== */
+function normalizeNotebook(nb, tripTitle){
+  nb.tripTitle = tripTitle || nb.tripTitle || "旅遊筆記";
+  //刪掉原本Json存法資料
+  if ("currency" in nb) delete nb.currency;
+	if ("tripExpenses" in nb) delete nb.tripExpenses;
+  if(!Array.isArray(nb.todoCategories) || nb.todoCategories.length === 0){
+	  nb.todoCategories = [
+	    { id: uid(), name: "事項" },
+	    { id: uid(), name: "吃的" },
+	    { id: uid(), name: "購物" }
+	  ];
+	}
+  if(!Array.isArray(nb.tripTodos)) nb.tripTodos = [];
+  if(!Array.isArray(nb.days) || nb.days.length === 0){
+    nb.days = defaultNotebook(nb.tripTitle).days;
+  }
+
+  for(const day of nb.days){
+    day.id ||= uid();
+    day.name ||= "Day";
+    day.date ||= "";
+    if(typeof day.date_auto !== "boolean"){
+      day.date_auto = !String(day.date || "").trim();
+    }
+    day.theme ||= "";
+    day.stay ||= "";
+    day.stay_photo_path ||= "";
+    day.stay_photo_updated_at ||= "";
+    day.notes ||= "";
+    if(!day.notes_by_role || typeof day.notes_by_role !== "object"){
+		  day.notes_by_role = { J: "", V: "" };
+		}
+
+		// 舊資料：如果 notes_by_role 都空，但 day.notes 有內容 → 放到 J
+		const jEmpty = !String(day.notes_by_role.J || "").trim();
+		const vEmpty = !String(day.notes_by_role.V || "").trim();
+		if((jEmpty && vEmpty) && String(day.notes || "").trim()){
+		  day.notes_by_role.J = day.notes;
+		}
+    if(!Array.isArray(day.spots)) day.spots = [];
+
+    for(const s of day.spots){
+      s.id ||= uid();
+      s.title ||= "";
+      s.photo_path ||= "";
+      s.photo_updated_at ||= "";
+      if(!Array.isArray(s.comments)) s.comments = [];
+      
+      // ✅ 縮圖裁切焦點（百分比）
+		  if(typeof s.thumbPosX !== "number") s.thumbPosX = 50; // 0~100
+		  if(typeof s.thumbPosY !== "number") s.thumbPosY = 50; // 0~100
+
+      // 舊資料相容：memo_by_role -> comments
+      if(s.memo_by_role && typeof s.memo_by_role === "object"){
+        const male = (s.memo_by_role.male || "").trim();
+        const female = (s.memo_by_role.female || "").trim();
+        if(male) s.comments.push({ id: uid(), role:"J", text: male });
+        if(female) s.comments.push({ id: uid(), role:"V", text: female });
+        delete s.memo_by_role;
+      }
+      if(typeof s._notifyNewSpot !== "boolean") s._notifyNewSpot = false;
+    }
+  }
+
+  // ✅ 花費分類：可自訂（改名後不會被硬改回交通）
+if(!Array.isArray(nb.expenseCategories) || nb.expenseCategories.length === 0){
+		  nb.expenseCategories = [
+		    { id: uid(), name: "餐飲", icon: "🍜" },
+		    { id: uid(), name: "購物", icon: "🛍️" },
+		    { id: uid(), name: "交通", icon: "🚃" },
+		    { id: uid(), name: "甜點", icon: "🍰" },
+		    { id: uid(), name: "娛樂", icon: "🕹️" }
+		  ];
+		}
+
+  const catByName = new Map(nb.todoCategories.map(c => [c.name, c.id]));
+	const defaultCatId = nb.todoCategories[0]?.id;
+
+	for(const t of nb.tripTodos){
+	  t.id ||= uid();
+	  t.text = String(t.text || "");
+	  t.done = !!t.done;
+
+	  // 舊資料相容：category(名稱) -> categoryId
+	  if(!t.categoryId){
+	    const oldName = String(t.category || "").trim();
+	    t.categoryId = catByName.get(oldName) || defaultCatId;
+	  }
+	  delete t.category;
+	}
+
+  return nb;
+}
+
+/* ===== DB load/save ===== */
+async function loadFromDb(){
+  if(!tripId){
+    alert("缺少旅程參數 trip，請從主頁進入。");
+    location.href = "index.html";
+    return;
+  }
+
+  $("saveBadge").textContent = "載入中…";
+
+  const { data, error } = await supabase
+    .from("trips")
+    .select("id,title,header_path,updated_at,notebook,currency")
+    .eq("id", tripId)
+    .single();
+
+  if(error){
+    console.error(error);
+    alert("載入失敗：" + (error.message || JSON.stringify(error)));
+    location.href = "index.html";
+    return;
+  }
+
+  state.tripMeta = {
+    title: data.title || "旅遊筆記",
+    header_path: data.header_path || "",
+    updated_at: data.updated_at || ""
+  };
+
+  const nbRaw = (data.notebook && Object.keys(data.notebook).length)
+    ? data.notebook
+    : defaultNotebook(state.tripMeta.title);
+
+  state.data = normalizeNotebook(nbRaw, state.tripMeta.title);
+  state.currency = data.currency ??"JPY";
+	if($("currency")) $("currency").value = state.currency;
+	if($("currency_m")) $("currency_m").value = state.currency;
+  state.activeDayId = state.data.days[0]?.id || null;
+
+  // ✅ 若 Day1 有日期且後面 date_auto=true，補齊（不強制 save）
+  autoFillDatesFromDay1();
+
+  if((!data.notebook || Object.keys(data.notebook).length === 0) && CAN_EDIT){
+	  await saveToDb(true);
+	}
+	
+	await loadExpensesFromDb();
+
+  $("saveBadge").textContent = "已同步";
+  $("tripTitleLabel").textContent = state.data.tripTitle || "旅遊筆記";
+  setCover();
+}
+function pruneDrafts(){
+  // todos：草稿且沒文字 → 移除
+  if(Array.isArray(state.data?.tripTodos)){
+    state.data.tripTodos = state.data.tripTodos.filter(t => {
+      if(!t) return false;
+      if(!t._draft) return true;
+      return String(t.text || "").trim().length > 0;
+    });
+  }
+
+}
+
+async function loadExpensesFromDb(){
+  const { data, error } = await supabase
+    .from("trip_expenses")
+    .select("id,trip_id,category,name,amount,payer,details,created_at")
+    .eq("trip_id", tripId)
+    .order("created_at", { ascending: false }); // 預設新到舊
+
+  if(error){
+    console.error(error);
+    alert("載入花費失敗：" + (error.message || JSON.stringify(error)));
+    state.expenses = [];
+    return;
+  }
+
+  state.expenses = (data || []).map(x => ({
+    id: x.id,
+    trip_id: x.trip_id,
+    category: x.category || "",
+    name: x.name || "",
+    amount: x.amount ?? "",     // numeric -> 顯示用字串/數字皆可
+    payer: (x.payer === "V") ? "V" : "J",
+    details: x.details || "",
+    created_at: x.created_at
+  }));
+}
+
+function openExpenseAddModal({ presetCat = null } = {}){
+  // ✅ 新增模式：先清掉編輯 id
+  state.editingExpenseId = null;
+
+  // 標題/按鈕文字回到新增
+  const titleEl = document.querySelector("#expenseAddMask .modalTitle");
+  if(titleEl) titleEl.textContent = "新增花費";
+  const saveBtn = $("expenseAddSave");
+  if(saveBtn) saveBtn.textContent = "新增";
+
+  // 建分類選單
+  const sel = $("expenseAddCat");
+  const cats = getExpenseCats();
+  sel.innerHTML = cats
+    .map(c => `<option value="${escapeAttr(c.name)}">${escapeHtml(c.icon || "•")} ${escapeHtml(c.name)}</option>`)
+    .join("");
+
+  // 預設分類：優先用目前篩選中的分類，再 fallback 第一個
+  const fallbackCat = cats[0]?.name || "購物";
+  const cat = presetCat || (state.expenseFilter !== "all" ? state.expenseFilter : fallbackCat);
+  sel.value = cats.some(c => c.name === cat) ? cat : fallbackCat;
+
+  // 預設值
+  $("expenseAddPayer").value = "J";
+  $("expenseAddName").value = "";
+  $("expenseAddAmt").value = "";
+  $("expenseAddDetails").value = "";
+
+  // 開 modal
+  $("expenseAddMask").style.display = "flex";
+  $("expenseAddMask").setAttribute("aria-hidden", "false");
+
+  setTimeout(() => $("expenseAddName")?.focus(), 50);
+}
+
+function openExpenseEditModal(expId){
+  const x = (state.expenses || []).find(e => e.id === expId);
+  if(!x) return;
+
+  // 先用新增 modal 的流程把 UI 打開 + 建好分類選單
+  openExpenseAddModal({ presetCat: x.category });
+
+  // ✅ 再進入編輯模式（一定要在 openExpenseAddModal 之後）
+  state.editingExpenseId = expId;
+
+  // 回填欄位
+  $("expenseAddCat").value = x.category || $("expenseAddCat").value;
+  $("expenseAddPayer").value = (x.payer === "V") ? "V" : "J";
+  $("expenseAddName").value = x.name || "";
+  $("expenseAddAmt").value  = String(x.amount ?? "");
+  $("expenseAddDetails").value = x.details || "";
+
+  // 標題/按鈕文字改成「編輯」
+  const titleEl = document.querySelector("#expenseAddMask .modalTitle");
+  if(titleEl) titleEl.textContent = "編輯花費";
+  const saveBtn = $("expenseAddSave");
+  if(saveBtn) saveBtn.textContent = "儲存";
+}
+
+function closeExpenseAddModal(){
+  $("expenseAddMask").style.display = "none";
+  $("expenseAddMask").setAttribute("aria-hidden", "true");
+
+  // ✅ 清掉編輯狀態，避免下次誤判
+  state.editingExpenseId = null;
+}
+
+async function saveCurrencyToDb(next){
+  if(!await requireEdit("修改幣別")) return;
+  const v = String(next ?? "").trim();   // 允許空字串
+
+  state.currency = v;
+  if($("currency")) $("currency").value = v;
+  if($("currency_m")) $("currency_m").value = v;
+
+  const { error } = await supabase
+    .from("trips")
+    .update({ currency: v, updated_at: new Date().toISOString() })
+    .eq("id", tripId);
+
+  if(error){
+    console.error(error);
+    alert("幣別儲存失敗：" + (error.message || JSON.stringify(error)));
+  }
+}
+function normalizeAmountForDb(v){
+  // 允許小數到第 2 位；空字串 => null
+  const s = String(v ?? "").trim();
+  if(!s) return null;
+
+  // 只留下數字/負號/小數點
+  const cleaned = s.replace(/[^\d.-]/g, "");
+
+  // 避免 "1.2.3" 這種
+  const n = Number(cleaned);
+  if(!isFinite(n)) return null;
+
+  // round to 2 decimals
+  return Math.round(n * 100) / 100;
+}
+
+async function insertExpenseToDb(row){
+  // row: {id, category, name, amount, payer}
+  if(!await requireEdit("新增花費")) return false;
+
+  const payload = {
+    id: row.id,
+    trip_id: tripId,
+    category: row.category || "",
+    name: row.name || "",
+    amount: normalizeAmountForDb(row.amount),
+    payer: (row.payer === "V") ? "V" : "J",
+    details: row.details || ""
+  };
+
+  const { error } = await supabase.from("trip_expenses").insert([payload]);
+  if(error){
+    console.error(error);
+    alert("新增花費失敗：" + (error.message || JSON.stringify(error)));
+    return false;
+  }
+  return true;
+}
+
+async function updateExpenseToDb(row){
+  if(!await requireEdit("修改花費")) return false;
+
+  const payload = {
+    category: row.category || "",
+    name: row.name || "",
+    amount: normalizeAmountForDb(row.amount),
+    payer: (row.payer === "V") ? "V" : "J",
+    details: row.details || ""
+  };
+
+  const { error } = await supabase
+    .from("trip_expenses")
+    .update(payload)
+    .eq("id", row.id)
+    .eq("trip_id", tripId);
+
+  if(error){
+    console.error(error);
+    alert("花費更新失敗：" + (error.message || JSON.stringify(error)));
+    return false;
+  }
+  return true;
+}
+
+async function deleteExpenseFromDb(expId){
+  if(!await requireEdit("刪除花費")) return false;
+
+  const { error } = await supabase
+    .from("trip_expenses")
+    .delete()
+    .eq("id", expId)
+    .eq("trip_id", tripId);
+
+  if(error){
+    console.error(error);
+    alert("刪除花費失敗：" + (error.message || JSON.stringify(error)));
+    return false;
+  }
+  return true;
+}
+
+async function saveToDb(immediate=false){
+	
+	if(!(await requireEdit("儲存"))) return;
+	
+  clearTimeout(state.saveTimer);
+
+  const doSave = async () => {
+    try{
+      $("saveBadge").textContent = "同步中…";
+      pruneDrafts();
+      state.data.updatedAt = new Date().toISOString();
+      
+      if(state.data && typeof state.data === "object"){
+			  delete state.data.tripExpenses;
+			  delete state.data.currency;
+			}
+
+      const { error } = await supabase
+        .from("trips")
+        .update({
+          title: state.data.tripTitle,
+          notebook: state.data,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", tripId);
+
+      if(error) throw error;
+      $("saveBadge").textContent = "已同步";
+    }catch(err){
+      console.error("save error:", err);
+      $("saveBadge").textContent = "同步失敗";
+      alert("同步失敗：" + (err.message || JSON.stringify(err)));
+    }
+  };
+
+  if(immediate) await doSave();
+  else state.saveTimer = setTimeout(doSave, 800);
+}
+
+/* ===== dayDock iOS fallback ===== */
+function setupDayDockPin(){
+  const mql = window.matchMedia("(max-width: 900px)");
+  if(!mql.matches) return;
+
+  const dock = $("dayDock");
+  const spacer = $("dayDockSpacer");
+  if(!dock || !spacer) return;
+
+  const getStickTop = () => {
+    const t = parseFloat(getComputedStyle(dock).top || "0");
+    return isFinite(t) ? t : 0;
+  };
+
+  const update = () => {
+    const stickTop = getStickTop();
+    const baseRect = dock.classList.contains("isFixed")
+      ? spacer.getBoundingClientRect()
+      : dock.getBoundingClientRect();
+
+    const shouldFix = baseRect.top <= stickTop;
+
+    if(shouldFix && !dock.classList.contains("isFixed")){
+      spacer.style.display = "block";
+      spacer.style.height = dock.offsetHeight + "px";
+      dock.classList.add("isFixed");
+    }else if(!shouldFix && dock.classList.contains("isFixed")){
+      dock.classList.remove("isFixed");
+      spacer.style.display = "none";
+      spacer.style.height = "0px";
+    }
+  };
+
+  window.addEventListener("scroll", update, { passive:true });
+  window.addEventListener("resize", () => {
+    dock.classList.remove("isFixed");
+    spacer.style.display = "none";
+    spacer.style.height = "0px";
+    update();
+  }, { passive:true });
+
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize", update, { passive:true });
+    window.visualViewport.addEventListener("scroll", update, { passive:true });
+  }
+
+  update();
+}
+
+/* ===== day helpers ===== */
+function activeDay(){
+  return state.data.days.find(d => d.id === state.activeDayId);
+}
+function updateMetaPanelAutoCollapse(){
+  const d = activeDay(); if(!d) return;
+  const ok = !!(String(d.date||"").trim() && d.theme.trim() && d.stay.trim());
+  $("metaSummaryRight").textContent = ok ? "已填寫" : "尚未完成";
+
+  if(ok){
+    const active = document.activeElement;
+    const ids = ["dayTheme","dayStay"];
+    const isMetaFocus = active && ids.includes(active.id);
+    if(!isMetaFocus){
+      $("metaPanel").open = false;
+    }
+  }
+}
+
+/* ===== day list ===== */
+async function addDay(){
+	
+	if(!await requireEdit("新增天數")) return;
+	 
+  const n = (state.data.days?.length || 0) + 1;
+
+  const d = {
+    id: uid(),
+    name: `Day ${n}`,
+    date: "",
+    date_auto: true,  // ✅ 新增天數預設走自動日期
+    theme: "",
+    stay: "",
+    stay_photo_path: "",
+    stay_photo_updated_at: "",
+    spots: [],
+    notes: ""
+  };
+
+  state.data.days.push(d);
+
+  // ✅ 若 Day1 已有日期，新增後立即補上日期
+  autoFillDatesFromDay1();
+
+  state.activeDayId = d.id;
+  saveToDb(true);
+  renderAll();
+
+  requestAnimationFrame(() => {
+    $("dayList")?.scrollTo({ left: 999999, behavior: "smooth" });
+  });
+}
+
+function bindSwipeReveal({
+  hostEl,                 // 外層容器（要 position:relative & overflow:hidden）
+  setTranslateX,          // (x)=>void，把內容推移
+  width = 84,             // 刪除按鈕寬度
+  onDelete,               // () => void
+  ignoreSelector = ""    //  這些元素上開始滑動就不處理 swipe
+}){
+  hostEl.style.setProperty("--swipeW", width + "px");
+
+  let startX = 0, startY = 0;
+  let dx = 0;
+  let dragging = false;
+  let locked = null; // null | "h" | "v"
+  let open = false;
+
+  const setX = (x) => {
+	  hostEl.style.setProperty("--swipeX", x + "px");
+	};
+
+  const close = () => { open = false; setX(0); };
+  const openIt = () => { open = true; setX(-width); };
+
+  hostEl.addEventListener("pointerdown", (e) => {
+    // 任何 pointer 都可以（手機/桌機都能拖出刪除鈕）
+    if(ignoreSelector && e.target.closest(ignoreSelector)) return;
+    dragging = true;
+    locked = null;
+    dx = 0;
+    startX = e.clientX;
+    startY = e.clientY;
+
+    hostEl.setPointerCapture?.(e.pointerId);
+  }, { passive:true });
+
+  hostEl.addEventListener("pointermove", (e) => {
+    if(!dragging) return;
+
+    const mx = e.clientX - startX;
+    const my = e.clientY - startY;
+
+    if(locked === null){
+      locked = (Math.abs(my) > Math.abs(mx)) ? "v" : "h";
+    }
+    if(locked === "v"){
+      dragging = false;
+      return;
+    }
+
+    // 水平滑動：只允許左滑露出、右滑收回
+    e.preventDefault();
+
+    // 如果正在編輯 input，滑動時先 blur，避免選字怪異
+    const ae = document.activeElement;
+    if(ae && hostEl.contains(ae) && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)){
+      ae.blur();
+    }
+
+    const base = open ? -width : 0;
+    const next = base + mx;         // mx<0 會往左
+    dx = Math.max(-width, Math.min(0, next));
+    setX(dx);
+  }, { passive:false });
+
+  hostEl.addEventListener("pointerup", (e) => {
+    if(!dragging) return;
+    dragging = false;
+    hostEl.releasePointerCapture?.(e.pointerId);
+
+    // 放開時「吸附」：滑過一半就打開，否則關閉
+    if(dx <= -width/2) openIt();
+    else close();
+
+    // 若剛剛是水平滑動，吃掉一次 click，避免誤觸（例如打開 spot modal）
+    if(locked === "h"){
+      hostEl.addEventListener("click", (ev) => {
+	    // ✅ 讓「刪除鈕」可以被點到，不要吃掉
+	    if(ev.target.closest(".swipeDeleteBtn")) return;
+
+	    ev.preventDefault();
+	    ev.stopPropagation();
+      }, { capture:true, once:true });
+    }
+  }, { passive:true });
+
+  hostEl.addEventListener("pointercancel", () => {
+    dragging = false;
+    close();
+  }, { passive:true });
+
+  // 點內容區（非刪除鈕）時，如果已開啟，就先關閉，不做其他事
+  hostEl.addEventListener("click", (e) => {
+    const delBtn = e.target.closest(".swipeDeleteBtn");
+    if(delBtn) return;
+
+    if(open){
+      e.preventDefault();
+      e.stopPropagation();
+      close();
+    }
+  }, true);
+
+  // 刪除鈕點下去：直接刪，不再 confirm
+  hostEl.querySelector(".swipeDeleteBtn")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onDelete?.();
+  });
+
+  return { close, open: openIt };
+}
+
+function renderDayList(filterText=""){
+  const list = $("dayList");
+  list.innerHTML = "";
+
+  const text = filterText.trim().toLowerCase();
+  const days = state.data.days
+    .map(d => {
+      if(!text) return { d, hit:true };
+      const blob = [
+        d.name, d.date, d.theme, d.stay,
+        (d.spots||[]).map(s => `${s.title} ${(s.comments||[]).map(c => c.role + c.text).join(" ")}`).join(" "),
+        (state.data.tripTodos||[]).map(x => x.text).join(" "),
+        (state.expenses||[]).map(x => `${x.category||""} ${x.name||""} ${x.amount||""}`).join(" ")
+      ].join("\n").toLowerCase();
+      return { d, hit: blob.includes(text) };
+    })
+    .filter(x => x.hit);
+
+  days.forEach(({ d }) => {
+    const item = document.createElement("div");
+    item.className = "dayItem" + (d.id === state.activeDayId ? " active" : "");
+    item.onclick = () => { state.activeDayId = d.id; renderAll(); };
+
+    const dateDisp = formatDisplayDate(d.date);
+    const themeText = (d.theme || "").trim();
+
+    item.innerHTML = `
+      <div class="dayTopRow">
+        <div class="dayName">${escapeHtml(d.name || "未命名")}</div>
+        ${dateDisp ? `<div class="pill">${escapeHtml(dateDisp)}</div>` : ``}
+      </div>
+      <div class="dayThemeLine">${escapeHtml(themeText)}</div>
+    `;
+
+    // ✅ 點 daycard 的日期 pill 直接編輯日期（不切換 day）
+    const pill = item.querySelector(".pill");
+    if(pill){
+      pill.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        editDayDate(d.id);
+      });
+    }
+		bindDayLongPressMenu(item, d.id);
+    list.appendChild(item);
+  });
+
+  const addTile = document.createElement("div");
+  addTile.className = "dayItem addDay";
+  addTile.textContent = "+";
+  addTile.title = "新增一天";
+  addTile.onclick = () => addDay();
+  list.appendChild(addTile);
+}
+
+/* ===== stay photo ===== */
+async function uploadStayPhoto(file){
+	
+	if(!await requireEdit("上傳住宿照片")) return;
+	
+  const d = activeDay(); if(!d) return;
+  const blob = await fileToJpegBlob(file, 1600, 0.85);
+  const path = `${tripId}/stay/${d.id}.jpg`;
+  await uploadJpegToStorage(path, blob);
+
+  d.stay_photo_path = path;
+  d.stay_photo_updated_at = new Date().toISOString();
+
+  await saveToDb(true);
+  renderStayPhoto();
+}
+function renderStayPhoto(){
+  const d = activeDay(); if(!d) return;
+  const img = $("stayPhotoImg");
+  const ph = $("stayPhotoPlaceholder");
+
+  if(d.stay_photo_path){
+    const url = getPublicUrl(d.stay_photo_path, d.stay_photo_updated_at || "");
+    img.src = url;
+    img.style.display = "block";
+    ph.style.display = "none";
+  }else{
+    img.src = "";
+    img.style.display = "none";
+    ph.style.display = "flex";
+  }
+}
+
+/* ===== lightbox ===== */
+function openImage(url){
+  if(!url) return;
+  $("imgPreview").src = url;
+  $("imgMask").style.display = "flex";
+  $("imgMask").setAttribute("aria-hidden","false");
+}
+function closeImage(){
+  $("imgMask").style.display = "none";
+  $("imgMask").setAttribute("aria-hidden","true");
+  $("imgPreview").src = "";
+}
+
+/* ===== spots ===== */
+async function addSpot(){
+	
+	if(!await requireEdit("新增景點")) return;
+	
+  const d = activeDay(); if(!d) return;
+
+  const newSpot = {
+    id: uid(),
+    title: "",
+    photo_path: "",
+    photo_updated_at: "",
+    comments: [],
+    _notifyNewSpot: true,       // ✅ 新增：只針對新建立的 spot
+    thumbPosX: 50,
+  	thumbPosY: 50
+  };
+
+  d.spots.push(newSpot);
+  state.activeSpotId = newSpot.id;
+
+  saveToDb(true);
+  renderSpotList();
+  openSpotModal(newSpot.id, { autoFocus: true });
+
+}
+
+async function pushNewSpotNotice(spotTitle){
+  try{
+    await fetch(`${PUSH_WORKER}/api/push/new-spot`, {
+      method: "POST",
+      headers: { "content-type":"application/json" },
+      body: JSON.stringify({ tripId, spotTitle })
+    });
+  }catch(e){
+    console.warn("push notice failed:", e);
+  }
+}
+function getSpotById(spotId){
+  const d = activeDay(); if(!d) return null;
+  return d.spots.find(x => x.id === spotId) || null;
+}
+async function uploadSpotPhoto(spotId, file){
+	
+	if(!await requireEdit("上傳照片")) return;
+	
+  const d = activeDay(); if(!d) return;
+  const s = getSpotById(spotId);
+  if(!s) return;
+
+  const blob = await fileToJpegBlob(file, 1600, 0.85);
+  const path = `${tripId}/spots/${d.id}/${spotId}.jpg`;
+  await uploadJpegToStorage(path, blob);
+
+  s.photo_path = path;
+  s.photo_updated_at = new Date().toISOString();
+
+  await saveToDb(true);
+  renderSpotModal();
+  renderSpotList();
+}
+async function deleteSpot(spotId, { skipConfirm = false } = {}){
+	
+	if(!await requireEdit("刪除景點")) return;
+	
+  const d = activeDay(); if(!d) return;
+  const idx = d.spots.findIndex(x => x.id === spotId);
+  if(idx < 0) return;
+	
+	if(!skipConfirm){
+    if(!confirm("確定刪除這個景點？")) return;
+  }
+  
+
+  const spot = d.spots[idx];
+
+  // 先刪 storage 圖片（若有）
+  if(spot?.photo_path){
+    await removePaths([spot.photo_path]);
+  }
+
+  d.spots.splice(idx, 1);
+  await saveToDb(true);
+
+  // 若剛好開著這個 spot modal 就關掉
+  if(state.activeSpotId === spotId) closeSpotModal();
+
+  renderSpotList();
+}
+function openSpotModal(spotId, { autoFocus = false } = {}){
+  state.activeSpotId = spotId;
+  renderSpotModal();
+  $("spotMask").style.display = "flex";
+  $("spotMask").setAttribute("aria-hidden","false");
+
+  // ✅ 只有新增時才自動跳到地點名稱並開鍵盤
+  if(autoFocus){
+    setTimeout(() => {
+      const input = $("spotTitleInput");
+      if(input){
+        input.focus();
+        input.select?.();
+      }
+    }, 50);
+  }
+}
+async function closeSpotModal(){
+  const spot = state.activeSpotId ? getSpotById(state.activeSpotId) : null;
+
+  if(spot && spot._notifyNewSpot){
+    const title = String(spot.title || "").trim();
+    if(title){
+      spot._notifyNewSpot = false;     // ✅ 先關掉，避免重複送
+      await saveToDb(true);            // ✅ 先存起來
+      pushNewSpotNotice(title);        // ✅ 不用 await
+    }
+  }
+
+  $("spotMask").style.display = "none";
+  $("spotMask").setAttribute("aria-hidden","true");
+  state.activeSpotId = null;
+}
+function renderSpotModal(){
+  const spot = state.activeSpotId ? getSpotById(state.activeSpotId) : null;
+  if(!spot) return;
+
+  $("spotModalTitle").textContent = spot.title ? `景點：${spot.title}` : "景點";
+  $("spotTitleInput").value = spot.title || "";
+
+  const wall = $("spotPhotoWall");
+  const img  = $("spotPhotoImg");
+  const ph   = $("spotPhotoPh");
+
+  if(spot.photo_path){
+    const url = getPublicUrl(spot.photo_path, spot.photo_updated_at || "");
+
+    // ✅ 先重置，避免沿用上一張圖的比例
+    if(wall) wall.style.aspectRatio = "4 / 3";
+
+    // ✅ 圖片載入後，用真實比例更新顯示框（長圖就不會被切）
+    img.onload = () => {
+      if(wall && img.naturalWidth && img.naturalHeight){
+        wall.style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
+      }
+    };
+
+    img.src = url;
+    img.style.display = "block";
+    ph.style.display = "none";
+  }else{
+    // ✅ 沒圖：回到預設比例
+    if(wall) wall.style.aspectRatio = "4 / 3";
+
+    img.src = "";
+    img.style.display = "none";
+    ph.style.display = "flex";
+  }
+
+  renderComments(spot);
+}
+function openThumbCropper(){
+  const spot = state.activeSpotId ? getSpotById(state.activeSpotId) : null;
+  if(!spot) return;
+
+  if(!spot.photo_path){
+    alert("請先上傳景點照片，才能調整縮圖");
+    return;
+  }
+
+  const url = getPublicUrl(spot.photo_path, spot.photo_updated_at || "");
+
+  // 初始值
+  const x0 = Number(spot.thumbPosX);
+	const y0 = Number(spot.thumbPosY);
+	const x = Number.isFinite(x0) ? x0 : 50;
+	const y = Number.isFinite(y0) ? y0 : 50;
+
+  state.thumbCrop = {
+    spotId: spot.id,
+    url,
+    posX: x,
+    posY: y,
+    // cover 計算用
+    imgW: 0, imgH: 0,
+    viewW: 0, viewH: 0,
+    dispW: 0, dispH: 0
+  };
+
+  const viewport = $("thumbCropViewport");
+  viewport.style.backgroundImage = `url('${url}')`;
+  viewport.style.backgroundPosition = `${x}% ${y}%`;
+
+  // 先開 modal
+  $("thumbCropMask").style.display = "flex";
+  $("thumbCropMask").setAttribute("aria-hidden","false");
+
+  // 取得圖片原始尺寸 + 計算 cover 幾何（拖曳要用）
+  const img = new Image();
+  img.onload = () => {
+    state.thumbCrop.imgW = img.naturalWidth || 0;
+    state.thumbCrop.imgH = img.naturalHeight || 0;
+
+    requestAnimationFrame(() => {
+      const r = viewport.getBoundingClientRect();
+      state.thumbCrop.viewW = r.width;
+      state.thumbCrop.viewH = r.height;
+
+      // cover 後實際顯示尺寸
+      const scale = Math.max(r.width / state.thumbCrop.imgW, r.height / state.thumbCrop.imgH);
+      state.thumbCrop.dispW = state.thumbCrop.imgW * scale;
+      state.thumbCrop.dispH = state.thumbCrop.imgH * scale;
+    });
+  };
+  img.src = url;
+}
+
+function closeThumbCropper(){
+  state.thumbCrop = null;
+  $("thumbCropMask").style.display = "none";
+  $("thumbCropMask").setAttribute("aria-hidden","true");
+  const viewport = $("thumbCropViewport");
+  viewport.style.backgroundImage = "";
+}
+
+function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+// 把 pos% 轉成「背景偏移 px」（用於拖曳累加）
+function posPercentToOffsetPx(posPct, view, disp){
+  if(disp <= view) return 0;
+  const range = view - disp;                 // 這是負數
+  return range * (posPct / 100);
+}
+
+// 把 offset px 轉回 pos%
+function offsetPxToPosPercent(offsetPx, view, disp){
+  if(disp <= view) return 50;
+  const range = view - disp;                 // 負數
+  return (offsetPx / range) * 100;
+}
+
+async function saveThumbCropper(){
+  if(!await requireEdit("調整縮圖位置")) return;
+
+  const c = state.thumbCrop;
+  if(!c?.spotId) return;
+
+  const spot = getSpotById(c.spotId);
+  if(!spot) return;
+
+  spot.thumbPosX = clamp(c.posX, 0, 100);
+  spot.thumbPosY = clamp(c.posY, 0, 100);
+
+  await saveToDb(true);
+  renderSpotList();
+  closeThumbCropper();
+}
+
+function deleteComment(commentId){
+  const spot = state.activeSpotId ? getSpotById(state.activeSpotId) : null;
+  if(!spot) return;
+  const idx = (spot.comments || []).findIndex(c => c.id === commentId);
+  if(idx < 0) return;
+
+  spot.comments.splice(idx, 1);
+  saveToDb(true);
+  renderComments(spot);
+  renderSpotList();
+}
+
+function renderComments(spot){
+  const list = $("commentList");
+  list.innerHTML = "";
+
+  const roleIcon = (r) => (r === "J" ? "💪" : r === "V" ? "🐽" : (r || ""));
+  const comments = spot.comments || [];
+
+  if(comments.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "muted";
+    empty.textContent = "尚無留言。";
+    list.appendChild(empty);
+    return;
+  }
+
+  comments.forEach(c => {
+    const row = document.createElement("div");
+    row.className = "commentItem commentItemRow";
+
+    const text = document.createElement("div");
+		text.className = "commentTextLine";
+
+		const badgeClass = c.role === "J" ? "roleBadge roleBadge--J"
+		                  : c.role === "V" ? "roleBadge roleBadge--V"
+		                  : "roleBadge";
+
+		const badge = document.createElement("span");
+		badge.className = badgeClass;
+		badge.textContent = roleIcon(c.role);
+
+		const content = document.createElement("span");
+		content.className = "commentContent";
+		content.textContent = c.text || "";
+
+		text.innerHTML = "";         // 清空
+		text.appendChild(badge);
+		text.appendChild(content);
+
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "btn bad commentDelBtn";
+    del.textContent = "✕";
+    del.title = "刪除留言";
+    del.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      deleteComment(c.id);
+    };
+
+    row.appendChild(text);
+    row.appendChild(del);
+    list.appendChild(row);
+  });
+
+  list.scrollTop = list.scrollHeight;
+}
+
+async function sendComment(){
+	
+	if(!await requireEdit("送出留言")) return;
+	
+  const spot = state.activeSpotId ? getSpotById(state.activeSpotId) : null;
+  if(!spot) return;
+
+  const role = $("commentRole").value;
+  const text = ($("commentText").value || "").trim();
+  if(!text) return;
+
+  spot.comments ||= [];
+  spot.comments.push({ id: uid(), role, text });
+
+  $("commentText").value = "";
+
+  await saveToDb(true);                 // ✅ 存完再送通知（避免 DB 還沒寫完）
+  renderComments(spot);
+  renderSpotList();
+
+  pushCommentNotice({ role, text, spotTitle: spot.title || "" }); // ✅ 不用 await 也行
+}
+async function pushCommentNotice({ role, text, spotTitle }){
+  try{
+    await fetch(`${PUSH_WORKER}/api/push/comment`, {
+      method: "POST",
+      headers: { "content-type":"application/json" },
+      body: JSON.stringify({ tripId, role, text, spotTitle })
+    });
+  }catch(e){
+    console.warn("push comment failed:", e);
+  }
+}
+
+function renderSpotList(){
+  const d = activeDay(); if(!d) return;
+  const box = $("spotList");
+  box.innerHTML = "";
+
+  const spots = d.spots || [];
+  if(spots.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "muted";
+    empty.textContent = "尚未新增景點。按下方「＋新增景點」。";
+    box.appendChild(empty);
+  }
+
+  for(const s of spots){
+    const row = document.createElement("div");
+    row.className = "spotRow swipeHost";
+    row.dataset.id = s.id;
+
+    let thumbHtml = `<div class="spotThumb"><div class="spotThumbPh">無照片</div></div>`;
+    if(s.photo_path){
+      const url = getPublicUrl(s.photo_path, s.photo_updated_at || "");
+      thumbHtml = `
+			  <div class="spotThumb">
+			    <img alt="thumb"
+			         src="${escapeAttr(url)}"
+			         style="object-position:${Number(s.thumbPosX ?? 50)}% ${Number(s.thumbPosY ?? 50)}%;">
+			  </div>
+			`;
+    }
+
+    const last = (s.comments && s.comments.length) ? s.comments[s.comments.length-1] : null;
+    const roleIcon = last?.role === "J" ? "💪" : last?.role === "V" ? "🐽" : "";
+    const sub = last ? `${roleIcon} ${last.text}` : "";
+
+    row.innerHTML = `
+		  <div class="swipeContent" style="display:flex; gap:10px; align-items:center; width:100%;">
+		    ${thumbHtml}
+		    <div class="spotInfo">
+		      <div class="spotTitleLine">${escapeHtml(s.title || "（未命名景點）")}</div>
+		      <div class="spotSubLine">${escapeHtml(sub)}</div>
+		    </div>
+		    <div class="spotHandle" aria-label="拖曳排序">≡</div>
+		  </div>
+
+		  <div class="swipeActions">
+		    <button class="swipeDeleteBtn" type="button">刪除</button>
+		  </div>
+		`;
+
+		const content = row.querySelector(".swipeContent");
+
+		// ✅ 左滑只露出刪除鈕；按鈕才刪（不 confirm）
+		bindSwipeReveal({
+		  hostEl: row,
+		  width: 84,
+		  setTranslateX: (x) => content.style.setProperty("--swipeX", x + "px"),
+		  onDelete: () => deleteSpot(s.id),
+		  ignoreSelector: ".spotHandle"   // ✅ 關鍵：拖曳排序 handle 不要觸發 swipe
+		});
+
+		// 點一下開 modal（若刪除鈕已打開，bindSwipeReveal 會先關閉）
+		row.addEventListener("click", () => openSpotModal(s.id));
+		
+    box.appendChild(row);
+    
+  }
+
+  const add = document.createElement("div");
+  add.className = "spotAddRow";
+  add.textContent = "＋ 新增景點";
+  add.onclick = () => addSpot();
+  box.appendChild(add);
+  setupSpotSortable();
+}
+function setupSpotSortable(){
+	
+	if(!CAN_EDIT) return;
+	
+  const d = activeDay(); if(!d) return;
+  const box = $("spotList"); if(!box) return;
+
+  // 先銷毀舊的
+  if(state.spotSortable){
+    try{ state.spotSortable.destroy(); }catch{}
+    state.spotSortable = null;
+  }
+
+  // 只允許拖 .spotRow，且不要拖到「＋新增景點」那個
+  state.spotSortable = new Sortable(box, {
+    animation: 150,
+    draggable: ".spotRow",
+    handle: ".spotHandle",
+    filter: ".spotAddRow",
+    preventOnFilter: false,
+    ghostClass: "spotGhost",
+    chosenClass: "spotChosen",
+    dragClass: "spotDrag",
+    fallbackOnBody: true,
+  // ✅ 手機長按才開始拖曳（避免一滑就進入排序）
+	  delay: 10,              // 長按 350ms 才會啟動拖曳（可調 250~500）
+	  delayOnTouchOnly: true,  // 只在觸控生效，桌機仍可直接拖
+	  touchStartThreshold: 1,  // 手指移動超過 8px 才算拖曳（避免誤觸）
+
+	  onStart: () => { box.classList.add("isDragging"); 
+	  								 box.querySelectorAll(".spotRow").forEach(el => el.style.setProperty("--swipeX","0px"));
+	  								},
+  	onEnd: async () => {
+    box.classList.remove("isDragging");
+      // 依照 DOM 新順序重排 d.spots
+      const ids = Array.from(box.querySelectorAll(".spotRow[data-id]"))
+        .map(el => el.dataset.id);
+
+      const map = new Map((d.spots || []).map(s => [s.id, s]));
+      d.spots = ids.map(id => map.get(id)).filter(Boolean);
+
+      await saveToDb(true);
+      // 重新 render 以確保事件處理器保持一致（也可不 render）
+      renderSpotList();
+    }
+  });
+}
+
+/* ===== todos (trip-level) ===== */
+function renderTodos(){
+  renderTodoTabs(); // ✅ 讓兩邊 tab 隨資料更新（數量/active）
+
+  const allTodos = state.data.tripTodos || [];
+  const targets = [$("todoList"), $("todoList_m")].filter(Boolean);
+  targets.forEach(t => t.innerHTML = "");
+
+  const fallback = getDefaultTodoCatId();
+
+  const todos = allTodos.filter(t => {
+    const cid = t.categoryId || fallback;
+    if(state.todoFilter === "all") return true;
+    return cid === state.todoFilter;
+  });
+  
+  const todosSorted = todos
+  .slice()
+  .sort((a,b) => Number(a.done) - Number(b.done)); // false(0) 先、true(1) 後
+
+  if(!todosSorted.length){
+    targets.forEach(t => {
+      const empty = document.createElement("div");
+      empty.className = "muted";
+      empty.textContent = "此分類尚無待辦";
+      t.appendChild(empty);
+    });
+    return;
+  }
+
+  targets.forEach(t => {
+    todosSorted.forEach((todo) => {
+      const row = document.createElement("div");
+			row.className = "checkItem todoRow swipeHost";
+			row.dataset.todoId = todo.id;
+
+			row.innerHTML = `
+			  <div class="swipeContent">
+			    <input type="checkbox" ${todo.done ? "checked" : ""} />
+			    <input class="todoTextInput" data-todo-id="${escapeAttr(todo.id)}"
+			           type="text" value="${escapeAttr(todo.text || "")}" placeholder="待辦內容" />
+			  </div>
+			  <div class="swipeActions">
+			    <button class="swipeDeleteBtn" type="button">刪除</button>
+			  </div>
+			`;
+			
+			const content = row.querySelector(".swipeContent");
+
+			// 綁 swipe（不 confirm）
+			bindSwipeReveal({
+			  hostEl: row,
+			  width: 84,
+			  setTranslateX: (x) => content.style.setProperty("--swipeX", x + "px"),
+			  onDelete: () => deleteTodoById(todo.id)
+			});
+
+			
+			
+      const cb = row.querySelector('input[type="checkbox"]');
+      const tx = row.querySelector('input[type="text"]');
+      
+      cb.disabled = !CAN_EDIT;     // ✅ checkbox 不吃 readOnly，只能 disabled
+			tx.readOnly = !CAN_EDIT;     // ✅ 文字用 readOnly
+
+      cb.onchange = async () => {
+      	const prev = !!todo.done;
+
+			  if(!await requireEdit("勾選待辦")){
+			    cb.checked = prev;        // ✅ Cancel 後 UI 回復
+			    return;
+			  }
+			  todo.done = cb.checked;
+			  if(!todo._draft) saveToDb();
+			  renderTodoTabs();
+			  renderTodos(); // ✅ 立刻重排：已完成移到下面
+			};
+
+      tx.oninput = async () => {
+      	const prev = todo.text || "";
+
+			  if(!await requireEdit("修改待辦")){
+			    tx.value = prev;          // ✅ 回復
+			    return;
+			  }
+        todo.text = tx.value;
+        if(todo._draft && String(todo.text || "").trim()){
+          todo._draft = false;
+        }
+        if(!todo._draft) saveToDb();
+      };
+
+      tx.onblur = () => {
+        if(todo._draft && !String(todo.text || "").trim()){
+          const i = state.data.tripTodos.findIndex(x => x.id === todo.id);
+          if(i >= 0) state.data.tripTodos.splice(i, 1);
+          renderTodos();
+        }
+      };
+
+      t.appendChild(row);
+    });
+  });
+}
+
+/* ===== expenses ===== */
+function getExpenseCats(){
+  return state.data?.expenseCategories || [];
+}
+
+function parseAmount(v){
+  const n = Number(String(v ?? "").replace(/[^\d.-]/g,""));
+  return isFinite(n) ? n : 0;
+}
+function calcExpenseSums(){
+  const rows = state.expenses || [];
+  const cats = getExpenseCats();
+
+  // sums.all: { total, J, V }
+  const sums = { all: { total: 0, J: 0, V: 0 } };
+
+  // sums[catName] = total
+  for(const c of cats) sums[c.name] = 0;
+
+  for(const x of rows){
+    const a = parseAmount(x.amount);
+
+    // ALL: total + payer breakdown
+    sums.all.total += a;
+    const payer = (x.payer === "V") ? "V" : "J"; // 預設 J
+    sums.all[payer] += a;
+
+    // 每個分類只算 total（不算 J/V）
+    if(sums[x.category] !== undefined){
+      sums[x.category] += a;
+    }
+  }
+
+  return sums;
+}
+function makeUniqueExpenseCatName(base="新分類"){
+  const cats = getExpenseCats();
+  if(!cats.some(c => c.name === base)) return base;
+  let i = 2;
+  while(cats.some(c => c.name === `${base}${i}`)) i++;
+  return `${base}${i}`;
+}
+
+async function addExpenseCategory(){
+	
+	if(!await requireEdit("新增分類")) return;
+	
+  state.data.expenseCategories ||= [];
+
+  const id = uid();
+  const name = makeUniqueExpenseCatName("新分類");
+
+  state.data.expenseCategories.push({
+    id,
+    name,
+    icon: "🏷️"
+  });
+
+  // 立刻開啟編輯視窗（讓你改名稱/emoji）
+  openExpenseCatEditor(id);
+
+  saveToDb(true);
+  updateExpenseSumUI();
+}
+async function deleteExpenseById(expId){
+	
+	if(!await requireEdit("刪除花費")) return;
+	
+  // 1) DB delete
+  const ok = await deleteExpenseFromDb(expId);
+  if(!ok) return;
+
+  // 2) local remove
+  state.expenses = (state.expenses || []).filter(e => e.id !== expId);
+  
+  renderExpenses();
+  updateExpenseSumUI();
+}
+
+
+function setExpenseFilter(cat){
+  if(cat === "all"){
+    state.expenseFilter = "all";
+  }else{
+    state.expenseFilter = (state.expenseFilter === cat) ? "all" : cat;
+  }
+  renderExpenses();
+  updateExpenseSumUI();
+}
+
+function initExpenseCatUIOnce(){
+  const bindRoot = (root) => {
+    if(!root) return;
+    if(root.dataset.boundExp === "1") return;
+    root.dataset.boundExp = "1";
+
+    let timer = null;
+    let longPressed = false;
+
+    const clear = () => {
+      if(timer) clearTimeout(timer);
+      timer = null;
+    };
+
+    const startPress = (e) => {
+      const box = e.target?.closest?.(".sumBox[data-exp-cat-id]");
+      if(!box || !root.contains(box)) return;
+
+      longPressed = false;
+      const catId = box.dataset.expCatId;
+
+      clear();
+      timer = setTimeout(() => {
+			  longPressed = true;
+
+			  // ✅ 清掉可能已經產生的文字選取（避免長按時把字反白）
+			  const sel = window.getSelection?.();
+			  if(sel && sel.removeAllRanges) sel.removeAllRanges();
+
+			  openExpenseCatEditor(catId);
+			  clear();
+			}, 550);
+    };
+
+    const cancelPress = () => clear();
+
+    root.addEventListener("touchstart", startPress, { passive:true });
+    root.addEventListener("touchend", cancelPress, { passive:true });
+    root.addEventListener("touchcancel", cancelPress, { passive:true });
+    root.addEventListener("touchmove", cancelPress, { passive:true });
+
+    root.addEventListener("pointerdown", startPress, { passive:true });
+    root.addEventListener("pointerup", cancelPress, { passive:true });
+    root.addEventListener("pointercancel", cancelPress, { passive:true });
+    root.addEventListener("pointermove", cancelPress, { passive:true });
+
+    // click 仍是篩選，但長按後吃掉 click
+    root.addEventListener("click", (e) => {
+      if(longPressed){
+        longPressed = false;
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+  };
+
+  bindRoot($("expenseSums"));
+  bindRoot($("expenseSums_m"));
+}
+
+function updateExpenseSumUI(){
+  const sums = calcExpenseSums();
+  const cur = String(state.currency ?? "JPY").trim();
+  const sumHtml = (n) => {
+	  const amt = formatNumber(n);
+	  return cur
+	    ? `<span class="sumAmt">${escapeHtml(amt)}</span><span class="sumCcy">${escapeHtml(cur)}</span>`
+	    : `<span class="sumAmt">${escapeHtml(amt)}</span>`;
+	};
+  	
+  const allJVText = (obj) => `💪 ${formatNumber(obj?.J || 0)}  🐽 ${formatNumber(obj?.V || 0)}`;
+  const cats = getExpenseCats();
+
+  const build = (el) => {
+    if(!el) return;
+
+    const mk = (cat) => {
+      const active = state.expenseFilter === cat.name;
+
+      // 未選中：只顯示 icon
+      if(!active){
+        return `
+          <div class="sumBox"
+               data-cat="${escapeAttr(cat.name)}"
+               data-exp-cat-id="${escapeAttr(cat.id)}">
+            ${escapeHtml(cat.icon || "•")}
+          </div>
+        `;
+      }
+
+      // ✅ 選中某分類：只顯示「分類加總」(不顯示 J/V)
+      return `
+        <div class="sumBox active"
+             data-cat="${escapeAttr(cat.name)}"
+             data-exp-cat-id="${escapeAttr(cat.id)}">
+          ${escapeHtml(cat.icon || "•")} ${escapeHtml(cat.name)} ${sumHtml(sums[cat.name] || 0)}
+        </div>
+      `;
+    };
+
+    // ✅ ALL：只有選中時才顯示 total + J/V；沒選中就只顯示 ALL
+    const allHtml = (state.expenseFilter === "all")
+	  ? `ALL ${sumHtml(sums.all.total)} <span class="sumMini">${escapeHtml(allJVText(sums.all))}</span>`
+	  : `ALL`;
+
+    el.innerHTML = `
+      <div class="sumBox ${state.expenseFilter === "all" ? "active" : ""}" data-cat="all">
+        ${allHtml}
+      </div>
+      ${cats.map(mk).join("")}
+      <div class="sumBox add" data-exp-cat-add title="新增分類">＋</div>
+    `;
+  };
+
+  build($("expenseSums"));
+  build($("expenseSums_m"));
+}
+function openExpenseCatEditor(catId){
+  const cat = getExpenseCats().find(c => c.id === catId);
+  if(!cat) return;
+
+  state.editingExpenseCatId = catId;
+
+  $("expenseCatName").value = cat.name || "";
+  $("expenseCatIcon").value = cat.icon || "";
+
+  $("expenseCatMask").style.display = "flex";
+  $("expenseCatMask").setAttribute("aria-hidden", "false");
+
+  setTimeout(() => {
+    const input = $("expenseCatName");
+    try{ input.focus({ preventScroll:true }); }catch{ input.focus(); }
+  }, 50);
+}
+
+function closeExpenseCatEditor(){
+  state.editingExpenseCatId = null;
+  $("expenseCatMask").style.display = "none";
+  $("expenseCatMask").setAttribute("aria-hidden", "true");
+  $("expenseCatName").value = "";
+  $("expenseCatIcon").value = "";
+}
+
+async function saveExpenseCatRename(){
+  if(!await requireEdit("調整分類")) return;
+
+  const catId = state.editingExpenseCatId;
+  if(!catId) return;
+
+  const cats = getExpenseCats();
+  const cat = cats.find(c => c.id === catId);
+  if(!cat) return;
+
+  const oldName = cat.name;
+
+  const nextName = ($("expenseCatName").value || "").trim();
+  const nextIcon = ($("expenseCatIcon").value || "").trim();
+  if(!nextName) return;
+
+  // 避免重名（排除自己）
+  if(cats.some(c => c.name === nextName && c.id !== catId)){
+    alert("分類名稱已存在");
+    return;
+  }
+
+  // 1) 先更新 notebook 內的分類表（UI/狀態）
+  cat.name = nextName;
+  cat.icon = nextIcon;
+
+  // 2) 先更新前端記憶體（讓畫面立即正確）
+  for(const e of (state.expenses || [])){
+    if(e.category === oldName) e.category = nextName;
+  }
+  if(state.expenseFilter === oldName) state.expenseFilter = nextName;
+
+  // 3) ✅ 批次更新 DB（trip_expenses）
+  // 只有「真的改名」才需要打 DB
+  if(oldName !== nextName){
+    const { error } = await supabase
+      .from("trip_expenses")
+      .update({ category: nextName })
+      .eq("trip_id", tripId)
+      .eq("category", oldName);
+
+    if(error){
+      console.error(error);
+      alert("分類改名同步到花費失敗：" + (error.message || JSON.stringify(error)));
+      // 你要更嚴謹可在此做 rollback（把 cat/name、state.expenses 改回 oldName）
+      return;
+    }
+  }
+
+  // 4) ✅ 存 notebook（expenseCategories 仍在 notebook JSON）
+  await saveToDb(true);
+
+  closeExpenseCatEditor();
+  renderExpenses();
+  updateExpenseSumUI();
+}
+
+async function deleteExpenseCategory(){
+  if(!await requireEdit("刪除分類")) return;
+
+  const catId = state.editingExpenseCatId;
+  if(!catId) return;
+
+  const cats = getExpenseCats();
+  if(cats.length <= 1){
+    alert("至少要保留 1 個分類");
+    return;
+  }
+
+  const idx = cats.findIndex(c => c.id === catId);
+  if(idx < 0) return;
+
+  const cat = cats[idx];
+  const oldName = cat.name;
+
+  // fallback：刪掉後要把原本的費用移過去
+  const fallback = cats.find(c => c.id !== catId);
+  if(!fallback) return;
+
+  if(!confirm(`確定刪除分類「${oldName}」？\n此分類的花費會移到「${fallback.name}」。`)) return;
+
+  // 1) 先更新前端記憶體（畫面立即正確）
+  for(const e of (state.expenses || [])){
+    if(e.category === oldName) e.category = fallback.name;
+  }
+  if(state.expenseFilter === oldName) state.expenseFilter = "all";
+
+  // 2) ✅ 先批次更新 DB（把舊分類的花費搬到 fallback）
+  const { error } = await supabase
+    .from("trip_expenses")
+    .update({ category: fallback.name })
+    .eq("trip_id", tripId)
+    .eq("category", oldName);
+
+  if(error){
+    console.error(error);
+    alert("分類刪除搬移花費失敗：" + (error.message || JSON.stringify(error)));
+    return;
+  }
+
+  // 3) 刪 notebook 內分類表
+  cats.splice(idx, 1);
+
+  // 4) ✅ 存 notebook（expenseCategories 仍在 notebook JSON）
+  await saveToDb(true);
+
+  closeExpenseCatEditor();
+  renderExpenses();
+  updateExpenseSumUI();
+}
+
+function renderExpenses(){
+  const rows = state.expenses || [];
+
+  const filtered = rows
+    .map((x, idx) => ({ x, idx }))
+    .filter(({x}) => state.expenseFilter === "all" ? true : x.category === state.expenseFilter);
+
+  let view = filtered.slice();
+  const sortKey = state.expenseSort || "new";
+
+  if(sortKey === "old"){
+    view.reverse();
+  }else if(sortKey === "amtDesc"){
+    view.sort((a,b) => {
+      const d = parseAmount(b.x.amount) - parseAmount(a.x.amount);
+      return d !== 0 ? d : (a.idx - b.idx);
+    });
+  }else if(sortKey === "amtAsc"){
+    view.sort((a,b) => {
+      const d = parseAmount(a.x.amount) - parseAmount(b.x.amount);
+      return d !== 0 ? d : (a.idx - b.idx);
+    });
+  }
+  // sortKey === "new"：不動（新到舊）
+
+  const bodies = [$("expenseBody"), $("expenseBody_m")].filter(Boolean);
+  bodies.forEach(b => b.innerHTML = "");
+
+  const cats = getExpenseCats();
+  const fallbackCat = cats[0]?.name || "餐飲";
+
+  const getCatIcon = (catName) => {
+    const c = cats.find(c => c.name === catName);
+    return c?.icon || "•";
+  };
+
+  const payerIcon = (p) => (p === "V" ? "🐽" : "💪");
+
+  const renderTo = (bodyEl) => {
+    if(!filtered.length){
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="4" class="muted">此分類沒有花費紀錄</td>`;
+      bodyEl.appendChild(tr);
+      return;
+    }
+
+    view.forEach(({x}) => {
+      x.id ||= uid();
+      x.name ||= "";
+      if(x.amount === undefined) x.amount = "";
+      if(x.payer !== "J" && x.payer !== "V") x.payer = "J";
+
+      // 若分類不存在 → 回到第一個分類
+      if(!cats.some(c => c.name === x.category)){
+        x.category = fallbackCat;
+      }
+
+      const tr = document.createElement("tr");
+      tr.className = "expRow";
+      tr.dataset.expId = x.id;
+
+      const icon = getCatIcon(x.category);
+      const name = String(x.name || "").trim() || "（未命名）";
+
+      // 顯示用金額
+      const amtNum = parseAmount(x.amount);
+      const amtText = (String(x.amount ?? "").trim() === "") ? "" : formatNumber(amtNum);
+
+      tr.innerHTML = `
+        <td class="expColCat">
+          <div class="expCatWrap">
+            <div class="expCatStatic" aria-hidden="true">${escapeHtml(icon)}</div>
+            <div class="expPayerBadge" title="付款人">${escapeHtml(payerIcon(x.payer))}</div>
+          </div>
+        </td>
+        <td title="${escapeAttr(name)}">
+          <div class="expNameText">${escapeHtml(name)}</div>
+        </td>
+        <td class="right expColAmt">${escapeHtml(amtText)}</td>
+        <td class="expColDel"></td>
+      `;
+
+      // 刪除按鈕（仍保留）
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "expDelBtn";
+      delBtn.textContent = "✕";
+      delBtn.title = "刪除";
+      delBtn.disabled = !CAN_EDIT;
+
+      delBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if(!CAN_EDIT) return;
+        if(confirm("確定刪除這筆花費紀錄？")){
+          deleteExpenseById(x.id);
+        }
+      });
+
+      tr.children[3].appendChild(delBtn);
+
+      // ✅ 點整列開 modal（排除點到刪除按鈕）
+      tr.addEventListener("click", (e) => {
+        if(e.target.closest(".expDelBtn")) return;
+        openExpenseEditModal(x.id);
+      });
+
+      bodyEl.appendChild(tr);
+    });
+  };
+
+  bodies.forEach(renderTo);
+  updateExpenseSumUI();
+}
+
+/* ===== render active day ===== */
+function renderActiveDay(){
+  const d = activeDay();
+  if(!d){
+	  $("dayHeader").textContent = "尚未建立天數";
+	  $("dayPill").textContent = "點我設定日期";
+	  $("dayDatePicker").value = dateToISO(new Date());
+	  return;
+	}
+
+  $("dayHeader").textContent = d.name || "未命名";
+  $("dayPill").textContent = formatDisplayDate(d.date) || "點我設定日期";
+
+  $("dayTheme").value = d.theme || "";
+  $("dayStay").value = d.stay || "";
+  const role = state.notesRole || "J";
+	$("dayNotes").value = (d.notes_by_role?.[role] ?? "");
+	$("dayNotes").placeholder = role === "J" ? "Johnny 今天被罵了甚麼呢?" : "貪吃小豬今天有甚麼開心事嗎?";
+
+	// tabs active
+	document.querySelectorAll("#notesTabs .notesTab").forEach(btn => {
+	  btn.classList.toggle("active", btn.dataset.notesRole === role);
+	});
+
+  renderStayPhoto();
+  renderSpotList();
+  renderTodos();
+  renderExpenses();
+  updateMetaPanelAutoCollapse();
+}
+
+function renderAll(){
+  $("tripTitleLabel").textContent = state.data.tripTitle || "旅遊筆記";
+  renderDayList($("search").value);
+  renderActiveDay();
+}
+
+async function deleteDayById(dayId){
+	
+	if(!await requireEdit("刪除天數")) return;
+	
+  const d = state.data.days.find(x => x.id === dayId);
+  if(!d) return;
+
+  if(!confirm(`確定刪除「${d.name}」？此操作無法復原。`)) return;
+
+  try{
+    // 1) 刪住宿照
+    if(d.stay_photo_path) await removePaths([d.stay_photo_path]);
+    else await removePaths([`${tripId}/stay/${d.id}.jpg`]);
+
+    // 2) 刪景點照片（先刪記錄到的，再刪資料夾殘留）
+    const spotPaths = (d.spots || []).map(s => s.photo_path).filter(Boolean);
+    await removePaths(spotPaths);
+    await removeFolder(`${tripId}/spots/${d.id}`);
+
+    // 3) 刪 day 資料
+    const idx = state.data.days.findIndex(x => x.id === d.id);
+    if(idx >= 0) state.data.days.splice(idx, 1);
+
+    if(!state.data.days.length){
+      state.data.days = defaultNotebook(state.data.tripTitle).days;
+    }
+    state.activeDayId = state.data.days[0].id;
+
+    autoFillDatesFromDay1();
+    await saveToDb(true);
+    renderAll();
+  }catch(err){
+    console.error(err);
+    alert("刪除失敗：" + (err.message || JSON.stringify(err)));
+  }
+}
+
+// ===== DayList long-press context menu =====
+const dayCtxMenu = $("dayCtxMenu");
+const dayCtxDelete = $("dayCtxDelete");
+const dayCtxRename = $("dayCtxRename");
+let dayCtxDayId = null;
+let dayCtxOpen = false;
+
+function closeDayCtxMenu(){
+  dayCtxOpen = false;
+  dayCtxDayId = null;
+  dayCtxMenu.style.display = "none";
+  dayCtxMenu.setAttribute("aria-hidden","true");
+}
+
+function openDayCtxMenu(dayId, clientX, clientY){
+  dayCtxDayId = dayId;
+
+  dayCtxMenu.style.display = "block";
+  dayCtxMenu.setAttribute("aria-hidden","false");
+
+  const pad = 10;
+  const rect = dayCtxMenu.getBoundingClientRect();
+
+  let x = clientX;
+  let y = clientY;
+
+  const maxX = window.innerWidth - rect.width - pad;
+  const maxY = window.innerHeight - rect.height - pad;
+
+  x = Math.max(pad, Math.min(maxX, x));
+  y = Math.max(pad, Math.min(maxY, y));
+
+  dayCtxMenu.style.left = x + "px";
+  dayCtxMenu.style.top  = y + "px";
+
+  dayCtxOpen = true;
+}
+
+// 點外面關閉
+document.addEventListener("pointerdown", (e) => {
+  if(!dayCtxOpen) return;
+  if(e.target.closest("#dayCtxMenu")) return;
+  closeDayCtxMenu();
+}, { capture:true });
+
+window.addEventListener("scroll", closeDayCtxMenu, { passive:true });
+window.addEventListener("resize", closeDayCtxMenu, { passive:true });
+
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape") closeDayCtxMenu();
+});
+dayCtxRename.addEventListener("click", async () => {
+  const id = dayCtxDayId;
+  closeDayCtxMenu();
+  if(!id) return;
+
+  const d = state.data.days.find(x => x.id === id);
+  if(!d) return;
+
+  const next = prompt("Day 名稱", d.name || "");
+  if(next === null) return;
+
+  const name = next.trim();
+  if(!name) return;
+
+  d.name = name;
+  await saveToDb(true);
+  renderAll();
+});
+dayCtxDelete.addEventListener("click", async () => {
+  const id = dayCtxDayId;
+  closeDayCtxMenu();
+  if(!id) return;
+  await deleteDayById(id);
+});
+
+// 綁在每張 dayItem 上
+function bindDayLongPressMenu(dayEl, dayId){
+  let timer = null;
+  let longPressed = false;
+  let sx = 0, sy = 0;
+
+  const clear = () => { if(timer) clearTimeout(timer); timer = null; };
+
+  dayEl.addEventListener("pointerdown", (e) => {
+    // 排除：點日期 pill（避免跟改日期衝突）
+    if(e.target.closest(".pill")) return;
+
+    longPressed = false;
+    sx = e.clientX; sy = e.clientY;
+
+    clear();
+    timer = setTimeout(() => {
+      longPressed = true;
+      // ✅ 清掉可能已經產生的文字選取
+		  const sel = window.getSelection?.();
+		  if(sel && sel.removeAllRanges) sel.removeAllRanges();
+      openDayCtxMenu(dayId, e.clientX, e.clientY);
+    }, 550);
+  }, { passive:true });
+
+  dayEl.addEventListener("pointermove", (e) => {
+    if(!timer) return;
+    if(Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10) clear();
+  }, { passive:true });
+
+  dayEl.addEventListener("pointerup", clear, { passive:true });
+  dayEl.addEventListener("pointercancel", clear, { passive:true });
+
+  // 長按後吃掉 click，避免切換 day
+  dayEl.addEventListener("click", (e) => {
+    if(!longPressed) return;
+    e.preventDefault();
+    e.stopPropagation();
+    longPressed = false;
+  }, true);
+
+  // 桌機右鍵也能叫出
+  dayEl.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    openDayCtxMenu(dayId, e.clientX, e.clientY);
+  });
+}
+
+async function scanReceiptFile(file){
+  // ✅ 先壓縮（收據 1280px 寬通常很夠）
+  const blob = await fileToJpegBlob(file, 1280, 0.75);
+
+  // ✅ 組 FormData 上傳到 Worker
+  const fd = new FormData();
+  fd.append("file", blob, "receipt.jpg");
+
+  const res = await fetch(`${PUSH_WORKER}/api/ocr/receipt`, {
+    method: "POST",
+    body: fd
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok || !data.ok){
+    throw new Error(data.error || `HTTP ${res.status}`);
+  }
+
+  // data: { ok:true, merchant, total, categoryGuess, currency }
+  return data;
+}
+
+/* ===== wire ===== */
+function wire(){
+  //$("btnHome").onclick = () => location.href = "index.html";
+  $("search").oninput = () => renderDayList($("search").value);
+
+  $("metaPanel").addEventListener("toggle", () => {
+    $("metaSummaryRight").textContent = $("metaPanel").open ? "點擊收合" : "點擊展開";
+  });
+
+  const bindDayInput = (id, field) => {
+    $(id).addEventListener("input", () => {
+      const d = activeDay(); if(!d) return;
+      d[field] = $(id).value;
+      saveToDb();
+      renderDayList($("search").value);
+      updateMetaPanelAutoCollapse();
+    });
+    $(id).addEventListener("blur", () => updateMetaPanelAutoCollapse());
+  };
+  bindDayInput("dayTheme","theme");
+  bindDayInput("dayStay","stay");
+
+  $("stayPhotoInput").addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    if(!file) return;
+    try{ await uploadStayPhoto(file); }
+    catch(err){ console.error(err); alert("上傳失敗：" + (err.message || JSON.stringify(err))); }
+    finally{ e.target.value = ""; }
+  });
+
+  $("stayPhotoBox").addEventListener("click", (e) => {
+    if(e.target.closest("label")) return;
+    const d = activeDay(); if(!d || !d.stay_photo_path) return;
+    const url = getPublicUrl(d.stay_photo_path, d.stay_photo_updated_at || "");
+    openImage(url);
+  });
+
+  $("imgClose").onclick = closeImage;
+  $("imgMask").addEventListener("click", (e) => {
+    if(e.target === $("imgMask")) closeImage();
+  });
+
+  $("spotClose").onclick = closeSpotModal;
+  $("spotMask").addEventListener("click", (e) => {
+    if(e.target === $("spotMask")) closeSpotModal();
+  });
+
+  $("spotTitleInput").addEventListener("input", () => {
+    const spot = state.activeSpotId ? getSpotById(state.activeSpotId) : null;
+    if(!spot) return;
+    spot.title = $("spotTitleInput").value;
+    saveToDb();
+    renderSpotList();
+    renderDayList($("search").value);
+    $("spotModalTitle").textContent = spot.title ? `景點：${spot.title}` : "景點";
+  });
+
+  $("spotDelete").onclick = async () => {
+    if(!state.activeSpotId) return;
+    deleteSpot(state.activeSpotId);
+  };
+
+  $("spotPhotoInput").addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    if(!file) return;
+    try{ await uploadSpotPhoto(state.activeSpotId, file); }
+    catch(err){ console.error(err); alert("上傳失敗：" + (err.message || JSON.stringify(err))); }
+    finally{ e.target.value = ""; }
+  });
+
+  $("spotPhotoWall").addEventListener("click", (e) => {
+    if(e.target.closest("label,button")) return;
+    const spot = state.activeSpotId ? getSpotById(state.activeSpotId) : null;
+    if(!spot || !spot.photo_path) return;
+    const url = getPublicUrl(spot.photo_path, spot.photo_updated_at || "");
+    openImage(url);
+  });
+  
+  // ✅ 點「縮圖」打開拖曳裁切 modal
+	$("spotThumbAdjustBtn")?.addEventListener("click", (e) => {
+	  e.preventDefault();
+	  e.stopPropagation(); // 避免被 spotPhotoWall 點擊事件打開大圖
+	  openThumbCropper();
+	});
+
+	// ✅ 關閉/點背景關閉
+	$("thumbCropClose")?.addEventListener("click", closeThumbCropper);
+	$("thumbCropMask")?.addEventListener("click", (e) => {
+	  if(e.target === $("thumbCropMask")) closeThumbCropper();
+	});
+
+	// ✅ 置中
+	$("thumbCropReset")?.addEventListener("click", () => {
+	  const c = state.thumbCrop;
+	  if(!c) return;
+	  c.posX = 50; c.posY = 50;
+	  $("thumbCropViewport").style.backgroundPosition = `50% 50%`;
+	});
+
+	// ✅ 儲存
+	$("thumbCropSave")?.addEventListener("click", saveThumbCropper);
+
+	// ✅ 拖曳操作（pointer）
+	{
+	  const viewport = $("thumbCropViewport");
+	  let dragging = false;
+	  let sx = 0, sy = 0;
+	  let startOffX = 0, startOffY = 0;
+
+	  viewport.addEventListener("pointerdown", (e) => {
+	    const c = state.thumbCrop;
+	    if(!c) return;
+
+			if(!(c.viewW > 0 && c.viewH > 0 && c.dispW > 0 && c.dispH > 0)) return;
+			
+	    dragging = true;
+	    sx = e.clientX; sy = e.clientY;
+
+	    // 把目前 pos% 轉成 offset(px) 當作拖曳起點
+	    startOffX = posPercentToOffsetPx(c.posX, c.viewW, c.dispW);
+	    startOffY = posPercentToOffsetPx(c.posY, c.viewH, c.dispH);
+
+	    viewport.setPointerCapture?.(e.pointerId);
+	  });
+
+	  viewport.addEventListener("pointermove", (e) => {
+	    if(!dragging) return;
+	    const c = state.thumbCrop;
+	    if(!c) return;
+
+	    e.preventDefault();
+
+	    const dx = e.clientX - sx;
+	    const dy = e.clientY - sy;
+
+	    // offset(px) += 拖曳位移
+	    let offX = startOffX + dx;
+	    let offY = startOffY + dy;
+
+	    // clamp 在可裁切範圍內：[(view-disp) , 0]
+	    const minX = c.viewW - c.dispW;
+	    const minY = c.viewH - c.dispH;
+
+	    offX = clamp(offX, minX, 0);
+	    offY = clamp(offY, minY, 0);
+
+	    // 轉回 pos%
+	    c.posX = clamp(offsetPxToPosPercent(offX, c.viewW, c.dispW), 0, 100);
+	    c.posY = clamp(offsetPxToPosPercent(offY, c.viewH, c.dispH), 0, 100);
+
+	    viewport.style.backgroundPosition = `${c.posX}% ${c.posY}%`;
+	  }, { passive:false });
+
+	  const end = (e) => {
+	    if(!dragging) return;
+	    dragging = false;
+	    viewport.releasePointerCapture?.(e.pointerId);
+	  };
+
+	  viewport.addEventListener("pointerup", end);
+	  viewport.addEventListener("pointercancel", end);
+	}
+
+  $("commentSend").onclick = sendComment;
+  
+  // 今日回顧 tabs
+	$("notesTabs")?.addEventListener("click", (e) => {
+	  const btn = e.target.closest(".notesTab[data-notes-role]");
+	  if(!btn) return;
+
+	  state.notesRole = btn.dataset.notesRole || "J";
+	  renderActiveDay(); // 直接刷新 textarea & tab 樣式
+	});
+
+	// 今日回顧 textarea：寫入 notes_by_role
+	$("dayNotes").addEventListener("input", () => {
+	  const d = activeDay(); if(!d) return;
+	  const role = state.notesRole || "J";
+	  d.notes_by_role ||= { J:"", V:"" };
+	  d.notes_by_role[role] = $("dayNotes").value;
+
+	  // 舊欄位保留：可選（建議留，避免你其他地方還引用 d.notes）
+	  d.notes = d.notes_by_role.J || "";
+
+	  saveToDb();
+	});
+
+  // ✅ 點「分類統計 pill」來篩選（含 ALL）
+  const onSumClick = (e) => {
+	  const addBtn = e.target.closest(".sumBox[data-exp-cat-add]");
+	  if(addBtn){
+	    addExpenseCategory();
+	    return;
+	  }
+
+	  const box = e.target.closest(".sumBox[data-cat]");
+	  if(!box) return;
+	  setExpenseFilter(box.dataset.cat);
+	};
+  $("expenseSums")?.addEventListener("click", onSumClick);
+  $("expenseSums_m")?.addEventListener("click", onSumClick);
+
+  $("currency")?.addEventListener("input", () => {
+	  saveCurrencyToDb($("currency").value);
+	  updateExpenseSumUI();
+	});
+	$("currency_m")?.addEventListener("input", () => {
+	  saveCurrencyToDb($("currency_m").value);
+	  updateExpenseSumUI();
+	});
+  
+  // ===== Expense Sort (desktop + mobile sync) =====
+	const sortDesktop = $("expenseSort");
+	const sortMobile  = $("expenseSort_m");
+
+	const syncExpenseSortSelect = () => {
+	  if(sortDesktop) sortDesktop.value = state.expenseSort || "new";
+	  if(sortMobile)  sortMobile.value  = state.expenseSort || "new";
+	};
+	syncExpenseSortSelect();
+
+	sortDesktop?.addEventListener("change", () => {
+	  state.expenseSort = sortDesktop.value || "new";
+	  syncExpenseSortSelect();
+	  renderExpenses();
+	});
+
+	sortMobile?.addEventListener("change", () => {
+	  state.expenseSort = sortMobile.value || "new";
+	  syncExpenseSortSelect();
+	  renderExpenses();
+	});
+  
+  // === Expense Category Modal events ===
+$("expenseCatCancel")?.addEventListener("click", closeExpenseCatEditor);
+$("expenseCatMask").addEventListener("click", (e) => {
+  if(e.target === $("expenseCatMask")) closeExpenseCatEditor();
+});
+$("expenseCatSave").addEventListener("click", saveExpenseCatRename);
+$("expenseCatDelete").addEventListener("click", deleteExpenseCategory);
+  // === Todo Category Modal events ===
+$("todoCatCancel")?.addEventListener("click", closeTodoCatEditor);
+$("todoCatMask").addEventListener("click", (e) => {
+  if(e.target === $("todoCatMask")) closeTodoCatEditor();
+});
+
+$("todoCatSave").addEventListener("click", () => {
+  const catId = state.editingTodoCatId;
+  const cat = (state.data?.todoCategories || []).find(c => c.id === catId);
+  if(!cat) return;
+
+  const name = ($("todoCatName").value || "").trim();
+  if(!name) return;
+
+  cat.name = name;
+  saveToDb(true);
+  renderTodoTabs();
+  renderTodos();
+  closeTodoCatEditor();
+});
+
+$("todoCatDelete").addEventListener("click", async () => {
+  const catId = state.editingTodoCatId;
+  if(!catId) return;
+
+  // deleteTodoCategory 內部有 confirm + 轉移 todo
+  await deleteTodoCategory(catId);
+
+  // 若刪掉了就關閉（deleteTodoCategory 若取消 confirm，資料不會動也沒差）
+  closeTodoCatEditor();
+});
+
+
+	  
+
+	initTodoTabUIOnce();
+  renderTodoTabs();
+  initExpenseCatUIOnce();
+  
+  const addTodo = () => {
+	  state.data.tripTodos ||= [];
+	  const id = uid();
+
+	  // ✅ 新增時：若目前選的是某個 tab，就用該 tab；否則用第一個分類
+	  const catId = (state.todoFilter !== "all") ? state.todoFilter : getDefaultTodoCatId();
+
+	  state.data.tripTodos.push({
+	    id,
+	    text: "",
+	    done: false,
+	    categoryId: catId,
+	    _draft: true
+	  });
+
+	  if(isMobile()){
+	    const details = $("todoDetails");
+	    if(details) details.open = true;
+	  }
+
+	  renderTodos();
+
+	  const target = pickVisible(`.todoTextInput[data-todo-id="${CSS.escape(id)}"]`);
+	  focusAndSelect(target);
+	};
+
+  $("btnAddTodo")?.addEventListener("click", addTodo);
+  $("btnAddTodo_m")?.addEventListener("click", addTodo);
+
+  const addExpense = async () => {
+	  const id = uid();
+
+	  // ✅ category：用目前篩選中的分類，否則用第一個分類
+	  const cats = getExpenseCats();
+	  const fallbackCat = cats[0]?.name || "交通";
+	  const cat = (state.expenseFilter !== "all") ? state.expenseFilter : fallbackCat;
+
+	  const row = { id, category: cat, name: "", amount: "", payer: "J" };
+
+	  const ok = await insertExpenseToDb(row);
+	  if(!ok) return;
+
+	  // 新到舊：unshift
+	  state.expenses.unshift({ ...row, created_at: new Date().toISOString() });
+
+	  if(isMobile()){
+	    const details = $("expenseDetails");
+	    if(details) details.open = true;
+	  }
+
+	  renderExpenses();
+	  const target = pickVisible(`.expNameInput[data-exp-id="${CSS.escape(id)}"]`);
+	  focusAndSelect(target);
+	};
+  const openExpenseUI = async () => {
+	  if(!await requireEdit("新增花費")) return;
+	  openExpenseAddModal();
+	};
+
+	$("btnAddExpense")?.addEventListener("click", openExpenseUI);
+	$("btnAddExpense_m")?.addEventListener("click", openExpenseUI);
+
+  // FAB: open expense area
+  $("fabExpense")?.addEventListener("click", openExpenseUI);
+  
+  //花費module
+	$("expenseAddMask")?.addEventListener("click", (e) => {
+	  if(e.target === $("expenseAddMask")) closeExpenseAddModal();
+	});
+	
+	$("expenseAddClose")?.addEventListener("click", (e) => {
+	  e.preventDefault();
+	  e.stopPropagation();
+	  closeExpenseAddModal();
+	});
+
+	$("expenseAddSave")?.addEventListener("click", async () => {
+  if(!await requireEdit(state.editingExpenseId ? "修改花費" : "新增花費")) return;
+
+  const cats = getExpenseCats();
+  const fallbackCat = cats[0]?.name || "餐飲";
+
+  const category = $("expenseAddCat").value || fallbackCat;
+  const payer = $("expenseAddPayer").value === "V" ? "V" : "J";
+  const name = ($("expenseAddName").value || "").trim();
+  const amount = ($("expenseAddAmt").value || "").trim();
+  const details = ($("expenseAddDetails").value || "").trim();
+
+  if(!amount){
+    alert("請輸入金額");
+    return;
+  }
+
+  // ✅ 編輯模式：update
+  if(state.editingExpenseId){
+    const x = state.expenses.find(e => e.id === state.editingExpenseId);
+    if(!x) return;
+
+    x.category = category;
+    x.payer = payer;
+    x.name = name;
+    x.amount = amount;
+    x.details = details;
+
+    const ok = await updateExpenseToDb(x);
+    if(!ok) return;
+
+    closeExpenseAddModal();
+    renderExpenses();
+    updateExpenseSumUI();
+    return;
+  }
+
+  // ✅ 新增模式：insert
+  const row = { id: uid(), category, name, amount, payer, details };
+
+  const ok = await insertExpenseToDb(row);
+  if(!ok) return;
+
+  state.expenses.unshift({ ...row, created_at: new Date().toISOString() });
+  closeExpenseAddModal();
+  renderExpenses();
+  updateExpenseSumUI();
+});
+	
+	$("expenseScanBtn")?.addEventListener("click", () => {
+	  $("expenseReceiptInput")?.click();
+	});
+
+	$("expenseReceiptInput")?.addEventListener("change", async (e) => {
+	  const file = e.target.files?.[0];
+	  if(!file) return;
+
+	  const scanBtn = $("expenseScanBtn");
+	  const prevText = scanBtn?.textContent;
+
+	  try{
+	    if(scanBtn){
+	      scanBtn.disabled = true;
+	      scanBtn.classList.add("isSpinning");
+				const iconEl = scanBtn.querySelector(".scanIcon");
+				if(iconEl) iconEl.textContent = "⏳";
+	    }
+
+	    const o = await scanReceiptFile(file);
+	    // o: { ok:true, merchant, total, categoryGuess, currency }
+
+	    // 1) 金額
+	    if(o.total != null && isFinite(Number(o.total))){
+	      $("expenseAddAmt").value = String(o.total);
+	    }
+
+	    // 2) 項目名稱：店名｜收據
+	    const merchant = String(o.merchant || "").trim();
+			$("expenseAddName").value = merchant ? merchant : "";
+
+	    // 3) 分類：如果 OCR 猜到的分類不存在，就 fallback 購物
+	    const cats = getExpenseCats();
+	    const fallbackCat = cats[0]?.name || "購物";
+
+	    const guess = String(o.categoryGuess || "").trim();
+	    const match = cats.find(c => c.name === guess);
+	    $("expenseAddCat").value = match ? match.name : fallbackCat;
+
+	    // 4) 幣別：先不自動改 trip-level 幣別（避免誤改）
+	    // 你需要的話可以在這裡提示或顯示小字提醒
+	    // console.log("OCR currency:", o.currency);
+	    
+	    $("expenseAddDetails").value = (o.detailsText || "").trim();
+
+	  }catch(err){
+	    console.error(err);
+	    alert("收據辨識失敗：" + (err?.message || String(err)));
+	  }finally{
+	    if(scanBtn){
+	      scanBtn.disabled = false;
+	      scanBtn.classList.remove("isSpinning");
+				const iconEl = scanBtn.querySelector(".scanIcon");
+				if(iconEl) iconEl.textContent = "📷";
+	    }
+	    e.target.value = "";
+	  }
+	});
+  
+  function preventDetailsToggleOnControls(detailsId){
+	  const details = document.getElementById(detailsId);
+	  const summary = details?.querySelector(":scope > summary");
+	  if(!details || !summary) return;
+
+	  summary.addEventListener("click", (e) => {
+	    if(e.target.closest("input, button, select, label")){
+	      e.preventDefault(); // 阻止 summary 的預設 toggle
+	    }
+	  }, true);
+	}
+
+	preventDetailsToggleOnControls("expenseDetails");
+	preventDetailsToggleOnControls("todoDetails");
+  
+  
+}
+//通知
+const VAPID_PUBLIC_KEY = "BN-v_VYdX62iacpTnq5TskkoJqLb08ILl3U5jMIJaM4QDo0SrVdNm-YIKHpYuptaVxlSbCW3otZCQQZmwb5uM1Y"; // publicKey
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const raw = atob(base64);
+  const arr = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; ++i) arr[i] = raw.charCodeAt(i);
+  return arr;
+}
+
+async function ensureServiceWorkerReady(){
+  if(!("serviceWorker" in navigator)) throw new Error("No serviceWorker support");
+
+  // ✅ 只 register 一次
+  const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+
+  // ✅ 等 SW ready（很重要）
+  await navigator.serviceWorker.ready;
+
+  return reg;
+}
+
+function setBellIcon(el){
+  if(!el) return;
+  el.innerHTML = `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <!-- solid bell -->
+      <path class="bell" d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z"></path>
+      <!-- slash for OFF -->
+      <path class="slash" d="M4 4L20 20"></path>
+    </svg>
+  `;
+}
+
+async function getPushEnabledForTrip(tripId){
+  if(!("serviceWorker" in navigator)) return false;
+  if(!("PushManager" in window)) return false;
+  if(Notification.permission !== "granted") return false;
+
+  const reg = await navigator.serviceWorker.getRegistration("/") 
+           || await navigator.serviceWorker.getRegistration();
+  if(!reg) return false;
+
+  const sub = await reg.pushManager.getSubscription();
+  if(!sub?.endpoint) return false;
+
+  // ✅ 去 DB 查這個 endpoint 目前綁的是哪個 trip
+  const { data, error } = await supabase
+    .from("push_subscriptions")
+    .select("trip_id")
+    .eq("endpoint", sub.endpoint)
+    .maybeSingle();
+
+  if(error) {
+    console.warn("check push_subscriptions failed:", error);
+    return false;
+  }
+
+  return data?.trip_id === tripId;
+}
+async function renderPushBell(){
+  const btn = $("btnEnablePush");
+  if(!btn) return;
+
+  setBellIcon(btn);
+
+  const enabled = await getPushEnabledForTrip(tripId);
+  btn.classList.toggle("enabled", enabled);
+  btn.title = enabled ? "通知：已開啟（點一下關閉）" : "通知：已關閉（點一下開啟）";
+  btn.setAttribute("aria-label", btn.title);
+}
+
+async function disablePush(){
+  const reg = await ensureServiceWorkerReady();
+  const sub = await reg.pushManager.getSubscription();
+  if(!sub) return;
+
+  const endpoint = sub.endpoint;
+
+  // 1) 取消訂閱（瀏覽器端）
+  await sub.unsubscribe();
+
+  // 2) 從 DB 刪掉
+  const del = await supabase
+    .from("push_subscriptions")
+    .delete()
+    .eq("endpoint", endpoint);
+
+  if(del.error){
+    console.warn("delete push_subscriptions failed:", del.error);
+    // 不中斷：至少本機 unsubscribe 成功了
+  }
+}
+
+async function enablePush(){
+	
+	//if(!await requireEdit("開啟通知")) return;
+	
+  const reg = await ensureServiceWorkerReady();
+
+  const perm = await Notification.requestPermission();
+  if(perm !== "granted"){
+    alert("未允許通知");
+    return;
+  }
+
+  let sub = await reg.pushManager.getSubscription();
+  if(!sub){
+    const keyArr = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+    sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: keyArr
+    });
+  }
+
+  const json = sub.toJSON();
+  const endpoint = json.endpoint;
+  const p256dh = json.keys?.p256dh || "";
+  const auth = json.keys?.auth || "";
+
+  const up = await supabase
+    .from("push_subscriptions")
+    .upsert([{ endpoint, p256dh, auth, trip_id: tripId }], { onConflict: "endpoint"  });
+
+  if(up.error){
+    console.error("push_subscriptions upsert error:", up.error);
+    alert("訂閱儲存失敗：" + (up.error.message || JSON.stringify(up.error)));
+    return;
+  }
+
+  alert("通知已開啟");
+  
+  await fetch(`${PUSH_WORKER}/api/push/new-subscriber`, {
+	  method: "POST",
+	  headers: { "content-type":"application/json" },
+	  body: JSON.stringify({ tripId })
+	});
+}
+
+$("btnEnablePush")?.addEventListener("click", async () => {
+  try{
+    const enabled = await getPushEnabledForTrip(tripId);
+    if(enabled){
+      await disablePush();
+      await renderPushBell();
+      alert("通知已關閉");
+    }else{
+      await enablePush();
+      await renderPushBell();
+      // enablePush 裡你已經 alert("通知已開啟") 也可以保留或移除
+    }
+  }catch(err){
+    console.error(err);
+    alert("切換通知失敗：" + (err?.message || String(err)));
+  }
+});
+
+
+(async () => {
+  await loadFromDb();
+  
+  wire();
+  renderAll();
+  
+  setReadonlyMode(!CAN_EDIT);
+  setupDayDockPin();
+  await renderPushBell();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1522 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" href="/icons/favicon.ico" sizes="any">
+	<link rel="icon" type="image/png" href="/icons/icon-192.png">
+
+	<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+
+	<link rel="manifest" href="/manifest.webmanifest">
+
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-title" content="Johnny/Vivian">
+	<meta name="theme-color" content="#fbf7f0">
+  <title>Johnny &amp; Vivian｜旅遊日記</title>
+  <style>
+    :root{
+      --paper: #fbf7f0;
+      --paper2:#f6f0e6;
+      --ink:   #2b2b2b;
+      --muted: #6b6b6b;
+
+      --lavender: #7c6ee6;
+      --lavender2:#a89cf2;
+      --snow: #ffffff;
+      --glacier:#dcecff;
+      --mint: #5bbf9a;
+      --amber:#d9a441;
+      --berry:#d46a7a;
+
+      --line: #e6e0f2;
+      --grid: rgba(124,110,230,.10);
+      --shadow: 0 10px 26px rgba(40,40,60,.07);
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+        var(--paper); /* ✅ 由漸層改純色 */
+      background-size: 24px 24px, 24px 24px, auto;
+    }
+    header{
+      padding: 18px 18px 10px 18px;
+      display:flex; justify-content:space-between; align-items:flex-end; gap:12px;
+    }
+    h1{ margin:0; font-size:18px; letter-spacing:.2px; }
+    .sub{ color:var(--muted); font-size:14px; margin-top:6px; line-height:1.5; }
+    .wrap{ padding: 0 18px 20px 18px; }
+    .toolbar{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      margin: 10px 0 14px 0;
+    }
+    .input{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.75);
+      border-radius: 12px;
+      padding: 10px 12px;
+      min-width: 240px;
+      outline:none;
+    }
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.75);
+      color: var(--ink);
+      padding:9px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:13px;
+      box-shadow: 0 2px 10px rgba(40,40,60,.05);
+    }
+    .btn:hover{ border-color: rgba(124,110,230,.45); background: rgba(168,156,242,.18); }
+    .btn.primary{ border-color: rgba(124,110,230,.55); background: rgba(124,110,230,.14); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .card{
+      border:1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,.72);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .meta{ color:var(--muted); font-size:12px; line-height:1.5; }
+    footer{ padding: 10px 18px 18px 18px; color:var(--muted); font-size:12px; }
+    .empty{ border:1px dashed var(--line); background: rgba(255,255,255,.55); padding:14px; border-radius:16px; }
+    /* 顯示狀態：旅程標題按鈕 */
+		.tripTitleBtn{
+		  display:block;
+		  font-size: 18px;      /* 原本大概 14 */
+		  line-height: 1.25;
+		  font-weight: 900;
+		}
+    
+		.tripTitleInput{
+		  width:100%;
+		  border:1px solid var(--line);
+		  background: rgba(255,255,255,.75);
+		  border-radius: 12px;
+		  padding: 8px 10px;
+		  font-size:18px;
+		  font-weight:800;
+		  outline:none;
+		}
+		.tripDelIconBtn{
+		  width: 26px;
+		  height: 26px;
+		  padding: 0;
+		  border-radius: 10px;
+
+		  border: 1px solid rgba(212,106,122,.22);
+		  background: rgba(212,106,122,.10);
+		  box-shadow: none;
+
+		  display: inline-flex;
+		  align-items: center;
+		  justify-content: center;
+		  cursor: pointer;
+		}
+
+		.tripDelIconBtn svg{
+		  width: 16px;
+		  height: 16px;
+		  stroke: rgba(120,40,55,.70)
+		}
+
+		.tripDelIconBtn:hover{
+		  background: rgba(212,106,122,.14);
+		  border-color: rgba(212,106,122,.30);
+		}
+
+		.iconBtn{
+		  width: 36px;
+		  height: 36px;
+		  border-radius: 12px;
+		  border: 1px solid var(--line);
+		  background: rgba(255,255,255,.78);
+		  box-shadow: 0 2px 10px rgba(40,40,60,.05);
+		  display:inline-flex;
+		  align-items:center;
+		  justify-content:center;
+		  cursor:pointer;
+		}
+		.iconBtn:hover{
+		  border-color: rgba(124,110,230,.45);
+		  background: rgba(168,156,242,.18);
+		}
+		.iconBtn svg{
+		  width: 18px;
+		  height: 18px;
+		  stroke: rgba(43,43,43,.78);
+		}
+		.iconBtn:focus{
+		  outline: 2px solid rgba(124,110,230,.35);
+		  outline-offset: 2px;
+		}
+		/* 讓 header 滿版（抵消 card padding） */
+		.card { position: relative; cursor: pointer;
+						transition: transform .08s ease, background-color .12s ease, border-color .12s ease;
+		  			-webkit-tap-highlight-color: transparent; }
+		  			
+		.card:active{
+		  transform: translateY(1px);
+		  background: rgba(168,156,242,.16);         /* 輕微變色（可調） */
+		  border-color: rgba(124,110,230,.45);
+		}
+.tripCardHeader{
+  /* 滿版：把 card 原 padding(14px) 吃掉 */
+  margin: -14px -14px 0 -14px;
+  height: 140px;                 /* 你覺得太高/太矮可調 */
+  border-radius: 16px 16px 0 0;  /* 上方圓角跟 card 一致 */
+  border: 1px solid var(--line);
+  border-bottom: none;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(124,110,230,.18), rgba(220,236,255,.55));
+  background-size: cover;
+  background-position: center;
+}
+
+/* 封面遮罩（讓 icon/文字更清楚） */
+.tripCardHeaderOverlay{
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.18));
+}
+
+/* 相機 icon 疊在封面右上角 */
+.headerTools{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+/* 底部工具列：左按鈕、右日期 */
+.tripFooterRow{
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.tripFooterLeft{
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.tripFooterRight{
+  text-align: right;
+  white-space: nowrap; /* 日期資訊靠右且不亂換行；若你想可換行可刪掉 */
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.3;
+}
+.tripMetaLine{
+  display: grid;
+  grid-template-columns: 44px auto; /* ✅ 讓「建立/更新」對齊的關鍵：可微調 40~52 */
+  column-gap: 6px;
+  justify-content: end;            /* ✅ 整行靠右 */
+  align-items: center;
+}
+
+.tripMetaLabel{
+  text-align: right;              /* ✅ label 靠右，冒號會垂直對齊 */
+  font-weight: 900;
+  color: var(--muted);
+}
+
+.tripMetaValue{
+  font-variant-numeric: tabular-nums; /* 可留可不留，數字更整齊 */
+}
+/* ---- Crop Modal ---- */
+.modalMask{
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.35);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 16px;
+}
+.modal{
+  width: min(720px, 100%);
+  background: rgba(255,255,255,.92);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 18px 60px rgba(0,0,0,.18);
+  overflow: hidden;
+}
+.modalHead{
+  padding: 12px 14px;
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  gap: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.modalTitle{
+  font-weight: 900;
+}
+.modalBody{
+  padding: 14px;
+}
+.cropStage{
+  width: 100%;
+  aspect-ratio: 3 / 1; /* 這就是「長條卡」比例，可改 16/9 或 2.5/1 */
+  background: rgba(124,110,230,.08);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  touch-action: none; /* 允許拖曳時不被瀏覽器捲動打斷 */
+}
+.cropStage img{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+.modalControls{
+  display:flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.range{
+  width: min(320px, 100%);
+}
+.modalFoot{
+  padding: 12px 14px;
+  display:flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid var(--line);
+}
+
+/* ✅ 右上角 icon 按鈕 */
+.topIconBtn{
+  position: absolute;
+  top: 14px;
+  right: 18px;
+
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 14px;
+
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.78);
+  box-shadow: 0 2px 10px rgba(40,40,60,.05);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.topIconBtn:hover{
+  border-color: rgba(124,110,230,.45);
+  background: rgba(168,156,242,.18);
+}
+
+.topIconImg{
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;     /* 想完整顯示可改成 contain */
+  border-radius: 14px;
+}
+/* ===== Trip card menu + push indicator ===== */
+.tripCardTools{
+  position: relative;
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}
+
+/* 黃色小鈴鐺：只顯示狀態，不可點 */
+.tripBellIndicator{
+  width: 26px;
+  height: 26px;
+  color: #f2b705;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.tripBellIndicator svg{ width: 22px; height: 22px; fill: currentColor; }
+
+/* 三點按鈕 */
+.tripMoreBtn{
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.78);
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(40,40,60,.05);
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: rgba(0,0,0,.55);
+}
+.tripMoreBtn:hover{
+  border-color: rgba(124,110,230,.45);
+  background: rgba(168,156,242,.18);
+}
+
+/* menu */
+.tripMenu{
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  min-width: 220px;
+  border: 1px solid rgba(0,0,0,.10);
+  background: rgba(255,255,255,.96);
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.18);
+  padding: 6px;
+  z-index: 999;
+}
+
+.tripMenuItem{
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 12px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  font-weight: 900;
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}
+.tripMenuItem:hover{ background: rgba(0,0,0,.06); }
+.tripMenuItem.danger{ color: #c0262d; }
+.tripMenuItem.danger:hover{ background: rgba(192,38,45,.10); }
+/* Push menu item colors */
+.tripMenuItem.pushOn{
+  color: #111;                 /* 深一點的黃/棕，文字清楚 */
+}
+.tripMenuItem.pushOn:hover{
+  background: rgba(242,183,5,.16); /* 黃色 hover */
+}
+
+.tripMenuItem.pushOff{
+  color: rgba(0,0,0,.55);         /* 灰色 */
+}
+.tripMenuItem.pushOff:hover{
+  background: rgba(0,0,0,.06);    /* 灰色 hover */
+}
+
+[hidden]{
+  display: none !important;
+}
+/* ===== Edit Gate (password / read-only) ===== */
+.gateMask{
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.45);
+  display: none;
+  align-items:center;
+  justify-content:center;
+  z-index: 2000;
+  padding: 16px;
+}
+.gateModal{
+  width: min(420px, 92vw);
+  background: rgba(255,255,255,.96);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 18px 60px rgba(0,0,0,.22);
+  overflow: hidden;
+}
+.gateHead{
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  font-weight: 900;
+}
+.gateBody{
+  padding: 14px;
+}
+.gateBody .hint{
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.gateInput{
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 16px;
+  outline: none;
+  background: rgba(255,255,255,.85);
+}
+.gateErr{
+  color: #c0262d;
+  font-weight: 900;
+  font-size: 13px;
+  margin-top: 8px;
+  min-height: 18px;
+}
+.gateFoot{
+  padding: 12px 14px;
+  border-top: 1px solid var(--line);
+  display:flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Johnny & Vivian｜旅遊日記</h1>
+    <div class="sub">
+      在這裡紀錄我們的旅程 讓每一個當下都成為永恆<br>
+    </div>
+  </div>
+  
+  <button class="topIconBtn" id="btnReload" type="button" aria-label="重新整理">
+    <img class="topIconImg" src="/icons/icon-192.png" alt="旅遊日記" />
+  </button>
+</header>
+
+<div class="wrap">
+ <div class="toolbar">
+	  <button class="btn primary" id="btnNew">＋ 建立旅程</button>
+	  <input class="input" id="search" placeholder="搜尋旅程標題…" />
+	</div>
+
+  <div class="grid" id="list"></div>
+
+  <div style="margin-top:12px" class="empty" id="empty" hidden>
+    尚未建立旅程。按上方「建立新旅程」開始。
+  </div>
+</div>
+
+<footer>
+  
+</footer>
+
+<!-- Crop Modal -->
+<div class="modalMask" id="cropMask" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modalHead">
+      <div class="modalTitle">裁切封面（拖曳移動、拉桿縮放）</div>
+      <button class="btn" id="cropClose" type="button">關閉</button>
+    </div>
+
+    <div class="modalBody">
+      <div class="cropStage" id="cropStage">
+        <img id="cropImg" alt="crop" />
+      </div>
+
+      <div class="modalControls">
+			  <button class="btn" id="cropReset" type="button">重置位置</button>
+			</div>
+			<div class="meta" style="margin-top:8px;">
+			  上下拖曳，選擇要顯示的畫面。
+			</div>
+    </div>
+
+    <div class="modalFoot">
+      <button class="btn" id="cropCancel" type="button">取消</button>
+      <button class="btn primary" id="cropOk" type="button">使用這張</button>
+    </div>
+  </div>
+</div>
+<!-- ===== Edit Gate Modal ===== -->
+<div class="gateMask" id="gateMask" aria-hidden="true">
+  <div class="gateModal" role="dialog" aria-modal="true">
+    <div class="gateHead">此裝置尚未授權</div>
+    <div class="gateBody">
+      <div class="hint">
+        這台裝置不在已授權清單中。<br>
+        請輸入密碼以開啟編輯功能，或選擇只瀏覽。
+      </div>
+      <input class="gateInput" id="gatePw" type="password" inputmode="numeric" placeholder="輸入密碼">
+      <div class="gateErr" id="gateErr"></div>
+    </div>
+    <div class="gateFoot">
+      <button class="btn" type="button" id="gateViewOnly">只瀏覽</button>
+      <button class="btn primary" type="button" id="gateUnlock">解鎖</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  const supabase = createClient(
+    "https://kskxjbzeokraeterqzzc.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtza3hqYnplb2tyYWV0ZXJxenpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDgyMDgsImV4cCI6MjA5NzgyNDIwOH0.bUmpIha1cpKIAGjD4Dvrmf0c44zYRmguigcf9N73BDk"
+  );
+
+  const INDEX_KEY = "tripIndex_v1";
+  const NOTEBOOK_FILE = "notebook.html";
+  const BUCKET = "TripCard-photo";
+
+  const $ = (id) => document.getElementById(id);
+  
+  // ===== Push on Index =====
+	const VAPID_PUBLIC_KEY = "BN-v_VYdX62iacpTnq5TskkoJqLb08ILl3U5jMIJaM4QDo0SrVdNm-YIKHpYuptaVxlSbCW3otZCQQZmwb5uM1Y";
+
+	const pushState = {
+	  endpoint: null,
+	  tripId: null, // 這台裝置目前綁定推播的 trip_id（沒有就 null）
+	};
+
+	function urlBase64ToUint8Array(base64String) {
+	  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+	  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+	  const raw = atob(base64);
+	  const arr = new Uint8Array(raw.length);
+	  for (let i = 0; i < raw.length; ++i) arr[i] = raw.charCodeAt(i);
+	  return arr;
+	}
+
+	async function ensureServiceWorkerReady(){
+	  if(!("serviceWorker" in navigator)) return null;
+	  const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+	  await navigator.serviceWorker.ready;
+	  return reg;
+	}
+
+	async function getCurrentSubscription(){
+	  if(!("serviceWorker" in navigator)) return null;
+	  const reg = await navigator.serviceWorker.getRegistration("/") || await navigator.serviceWorker.getRegistration();
+	  if(!reg) return null;
+	  return await reg.pushManager.getSubscription();
+	}
+
+	async function loadPushStateFromDb(){
+	  pushState.endpoint = null;
+	  pushState.tripId = null;
+
+	  const sub = await getCurrentSubscription();
+	  if(!sub?.endpoint) return;
+
+	  pushState.endpoint = sub.endpoint;
+
+	  const { data, error } = await supabase
+	    .from("push_subscriptions")
+	    .select("trip_id")
+	    .eq("endpoint", sub.endpoint)
+	    .limit(1)
+	    .maybeSingle();
+
+	  if(error){
+	    console.warn("loadPushStateFromDb error:", error);
+	    return;
+	  }
+
+	  pushState.tripId = data?.trip_id || null;
+	}
+	
+	const PUSH_WORKER = "https://trip-plan-push.johnnydx72870820.workers.dev";
+
+	async function enablePushForTrip(tripId){
+	  const reg = await ensureServiceWorkerReady();
+	  if(!reg) throw new Error("No serviceWorker");
+
+	  const perm = await Notification.requestPermission();
+	  if(perm !== "granted"){
+	    alert("未允許通知");
+	    return;
+	  }
+
+	  let sub = await reg.pushManager.getSubscription();
+	  if(!sub){
+	    sub = await reg.pushManager.subscribe({
+	      userVisibleOnly: true,
+	      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+	    });
+	  }
+
+	  const json = sub.toJSON();
+	  const endpoint = json.endpoint;
+	  const p256dh = json.keys?.p256dh || "";
+	  const auth = json.keys?.auth || "";
+
+	  const { error } = await supabase
+	    .from("push_subscriptions")
+	    .upsert([{ endpoint, p256dh, auth, trip_id: tripId }], { onConflict: "endpoint" });
+
+	  if(error){
+	    alert("訂閱儲存失敗：" + (error.message || JSON.stringify(error)));
+	    return;
+	  }
+	  
+	  // ✅ 新裝置加入：通知所有訂閱者（先不排除自己）
+		await fetch(`${PUSH_WORKER}/api/push/new-subscriber`, {
+		  method: "POST",
+		  headers: { "content-type":"application/json" },
+		  body: JSON.stringify({tripId,})
+		});
+	}
+	
+	async function canEditFromWorker(){
+	  const deviceId = getDeviceId();
+	  const res = await fetch(`${PUSH_WORKER}/api/edit/can-edit`, {
+	    method: "POST",
+	    headers: { "content-type":"application/json" },
+	    body: JSON.stringify({ deviceId })
+	  });
+	  const data = await res.json().catch(()=>({}));
+	  return !!data?.canEdit;
+	}
+
+	async function unlockByWorker(password){
+	  const deviceId = getDeviceId();
+	  const res = await fetch(`${PUSH_WORKER}/api/edit/unlock`, {
+	    method: "POST",
+	    headers: { "content-type":"application/json" },
+	    body: JSON.stringify({ deviceId, password })
+	  });
+	  const data = await res.json().catch(()=>({}));
+	  return !!data?.canEdit;
+	}
+
+	async function disablePush(){
+	  const reg = await ensureServiceWorkerReady();
+	  if(!reg) return;
+
+	  const sub = await reg.pushManager.getSubscription();
+	  if(!sub) return;
+
+	  const endpoint = sub.endpoint;
+	  await sub.unsubscribe();
+
+	  const { error } = await supabase
+	    .from("push_subscriptions")
+	    .delete()
+	    .eq("endpoint", endpoint);
+
+	  if(error) console.warn("delete push_subscriptions failed:", error);
+	}
+
+	function applyTripCardPushUI(cardEl, tripId){
+	  const indicator = cardEl.querySelector("[data-bell-indicator]");
+	  if(indicator){
+	    indicator.hidden = !(pushState.tripId && pushState.tripId === tripId);
+	  }
+
+	  const btn = cardEl.querySelector("[data-trip-push-toggle]");
+	  if(btn){
+	    const isThisTrip = (pushState.tripId === tripId);
+
+	    // 清掉舊 class
+	    btn.classList.remove("pushOn", "pushOff");
+
+	    if(isThisTrip){
+	      // ✅ 已開啟 → 顯示「關閉通知」(灰色)
+	      btn.classList.add("pushOff");
+	      btn.innerHTML = `
+	        <span style="width:18px;text-align:center;color:rgba(0,0,0,.55)">🔕</span>
+	        <span>關閉通知</span>
+	      `;
+	    }else{
+	      // ✅ 未開啟 → 顯示「開啟通知」(黃色)
+	      btn.classList.add("pushOn");
+	      btn.innerHTML = `
+	        <span style="width:18px;text-align:center;color:#f2b705">🔔</span>
+	        <span>開啟通知</span>
+	      `;
+	    }
+	  }
+	}
+	
+	// ===== Edit Gate (front-end only) =====
+	let CAN_EDIT = false;
+	//解鎖後記 30 天 存在localstorage
+	const EDIT_UNLOCK_KEY = "edit_unlock_until";
+	const EDIT_UNLOCK_MS = 30 * 24 * 60 * 60 * 1000; // 
+
+	function requireEdit(actionName = "編輯"){
+	  if (CAN_EDIT) return true;
+	  alert(`目前為唯讀模式，無法${actionName}。`);
+	  return false;
+	}
+  /* 
+	function isUnlockedByLocal(){
+	  const until = Number(localStorage.getItem(EDIT_UNLOCK_KEY) || "0");
+	  return until && Date.now() < until;
+	}
+	function setUnlocked(){
+	  localStorage.setItem(EDIT_UNLOCK_KEY, String(Date.now() + EDIT_UNLOCK_MS));
+	}
+	function clearUnlocked(){
+	  localStorage.removeItem(EDIT_UNLOCK_KEY);
+	}
+	*/
+	function showGateModal(){
+	  return new Promise((resolve) => {
+	    const mask = $("gateMask");
+	    const pw = $("gatePw");
+	    const err = $("gateErr");
+	    const btnUnlock = $("gateUnlock");
+	    const btnViewOnly = $("gateViewOnly");
+
+	    const close = (ok) => {
+	      mask.style.display = "none";
+	      mask.setAttribute("aria-hidden","true");
+	      err.textContent = "";
+	      pw.value = "";
+	      cleanup();
+	      resolve(ok);
+	    };
+
+	    const onUnlock = async () => {
+			  err.textContent = "";
+			  const input = (pw.value || "").trim();
+			  if(!input) return;
+
+			  const ok = await unlockByWorker(input);
+			  if(ok){
+			    close(true);
+			  }else{
+			    err.textContent = "密碼錯誤";
+			    pw.focus();
+			    pw.select?.();
+			  }
+			};
+
+	    const onViewOnly = () => close(false);
+
+	    const onKey = (e) => {
+	      if(e.key === "Enter") onUnlock();
+	      if(e.key === "Escape") onViewOnly();
+	    };
+
+	    const cleanup = () => {
+	      btnUnlock.removeEventListener("click", onUnlock);
+	      btnViewOnly.removeEventListener("click", onViewOnly);
+	      pw.removeEventListener("keydown", onKey);
+	    };
+
+	    btnUnlock.addEventListener("click", onUnlock);
+	    btnViewOnly.addEventListener("click", onViewOnly);
+	    pw.addEventListener("keydown", onKey);
+
+	    mask.style.display = "flex";
+	    mask.setAttribute("aria-hidden","false");
+	    setTimeout(() => pw.focus(), 50);
+	  });
+	}
+
+	function getDeviceId(){
+	  let id = localStorage.getItem("device_id");
+	  if(!id){
+	    id = crypto.randomUUID();
+	    localStorage.setItem("device_id", id);
+	  }
+	  return id;
+	}
+	
+	async function resolveEditPermission(){
+	  // 1) 先問 Worker：這台 deviceId 是否已授權
+	  const ok0 = await canEditFromWorker();
+	  if(ok0) return true;
+
+	  // 2) 沒授權 → 彈窗：輸密碼 or 只瀏覽
+	  const ok = await showGateModal();
+	  return ok;
+	}
+
+
+	// 套用唯讀 UI（把會改資料的按鈕/功能拿掉）
+	function applyReadOnlyUI(){
+	  // 例如：不給建立新旅程
+	  $("btnNew")?.setAttribute("hidden", "true");
+
+	  // 卡片裡：移除上傳封面、三點 menu、改名
+	  document.querySelectorAll(".card").forEach(card => {
+	    card.querySelector(".headerTools")?.remove();         // 上傳封面
+	    card.querySelector("[data-trip-more]")?.remove();     // 三點按鈕
+	    card.querySelector("[data-trip-menu]")?.remove();     // menu 本體
+	  });
+
+	  // 若你不想唯讀也能改名：也可以直接不綁 edit-title click（下面 render 會處理）
+	}
+	
+	
+  
+async function registerSW(){
+  if(!("serviceWorker" in navigator)) return;
+  await navigator.serviceWorker.register("/sw.js");
+}
+registerSW();
+
+  async function loadIndex(){
+    // 1) Supabase
+    const { data, error } = await supabase
+      .from("trips")
+      .select("id,title,created_at,updated_at,header_path")
+      .order("created_at", { ascending: false });
+
+    if(!error && data){
+      const mapped = data.map(t => ({
+        id: t.id,
+        title: t.title,
+        createdAt: t.created_at,
+        updatedAt: t.updated_at,
+        headerPath: t.header_path || "",
+        headerUrl: headerUrlFromPath(t.header_path,  t.updated_at || ""),
+        storageKey: `tripNotebook_v1:${t.id}`
+      }));
+      localStorage.setItem(INDEX_KEY, JSON.stringify(mapped));
+      return mapped;
+    }
+
+    // 2) fallback localStorage
+    const raw = localStorage.getItem(INDEX_KEY);
+    if(!raw) return [];
+    try { return JSON.parse(raw); } catch { return []; }
+  }
+
+  function saveIndex(list){
+    localStorage.setItem(INDEX_KEY, JSON.stringify(list));
+  }
+  
+  function headerUrlFromPath(path, version=""){
+  if(!path) return "";
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+  // 加 v 參數避免快取（可用 header_updated_at 或 updated_at）
+  return data.publicUrl + (version ? `?v=${encodeURIComponent(version)}` : "");
+	}
+
+  function newTripTemplate(title){
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    return {
+      id,
+      title: title || "未命名旅程",
+      createdAt: now,
+      updatedAt: now,
+      storageKey: `tripNotebook_v1:${id}`
+    };
+  }
+  
+  
+	/** 遞迴刪除 prefix 底下所有檔案（含子資料夾） */
+	/** 遞迴刪除 prefix 底下所有檔案（含子資料夾），不漏刪版 */
+async function removeFolderDeep(prefix){
+		  const queue = [prefix];
+
+		  while(queue.length){
+		    const p = queue.shift();
+
+		    // ✅ 不用 offset 分頁（避免刪除後資料往前補造成漏刪）
+		    while(true){
+		      const { data, error } = await supabase
+		        .storage
+		        .from(BUCKET)
+		        .list(p, { limit: 1000, offset: 0 });
+
+		      if(error) throw error;
+		      if(!data || data.length === 0) break;
+
+		      const files = [];
+
+		      for(const item of data){
+		        if(!item?.name) continue;
+
+		        // folder: id=null / metadata=null（Supabase 常見型態）
+		        const isFolder = !item.id && !item.metadata;
+
+		        if(isFolder){
+		          queue.push(`${p}/${item.name}`);
+		        }else{
+		          files.push(`${p}/${item.name}`);
+		        }
+		      }
+
+		      // 先刪檔案
+		      if(files.length){
+		        const { error: rmErr } = await supabase.storage.from(BUCKET).remove(files);
+		        if(rmErr) throw rmErr;
+		      }else{
+		        // 這層只有資料夾（都已丟 queue），就可以跳出這層
+		        break;
+		      }
+		    }
+		  }
+		}
+
+	function formatToMinute(iso){
+  const d = new Date(iso);
+  if(isNaN(d.getTime())) return "";
+  return d.toLocaleString("zh-TW", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  });
+}
+
+	async function uploadTripHeader(tripId, blob){
+  const path = `${tripId}/header.jpg`; // 固定路徑，確保覆蓋
+
+  const { error: upErr } = await supabase
+    .storage
+    .from(BUCKET)
+    .upload(path, blob, {
+      upsert: true,
+      cacheControl: "3600",
+      contentType: "image/jpeg"
+    });
+
+  if(upErr) throw upErr;
+
+  const { error: dbErr } = await supabase
+  .from("trips")
+  .update({
+    header_path: path,
+    updated_at: new Date().toISOString()
+  })
+  .eq("id", tripId);
+
+  return path;
+}
+  function initNotebookDataIfMissing(trip){
+    const key = trip.storageKey;
+    if(localStorage.getItem(key)) return;
+    const data = {
+      tripTitle: trip.title,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      days: [{
+        id: crypto.randomUUID(),
+        name: "Day 1",
+        date: "",
+        theme: "",
+        stay: "",
+        plan: "",
+        notes: "",
+        tips: "",
+        currency: "JPY",
+        links: [],
+        todos: [],
+        expenses: []
+      }]
+    };
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  }
+  function fmt(iso){
+     if(!iso) return "—";
+  	 return formatToMinute(iso) || "—";
+  }
+  function startInlineRename(cardEl, trip){
+  const btn = cardEl.querySelector(`[data-edit-title="${trip.id}"]`);
+  if(!btn) return;
+
+  const input = document.createElement("input");
+  input.className = "tripTitleInput";
+  input.value = trip.title || "";
+  input.setAttribute("maxlength", "60");
+
+  // 用 input 替換原本按鈕
+  btn.replaceWith(input);
+  input.focus();
+  input.select();
+
+  const commit = async () => {
+  	if(!requireEdit("改名")) { await render(); return; }
+    const next = input.value.trim() || "未命名旅程";
+    if(next === trip.title){
+      // 沒改就復原
+      input.replaceWith(btn);
+      return;
+    }
+
+    // 先把 UI 反映（也可等成功才改）
+    const oldTitle = trip.title;
+    trip.title = next;
+
+    try{
+      // 寫回 Supabase
+      const { error } = await supabase
+        .from("trips")
+        .update({ title: next, updated_at: new Date().toISOString() })
+        .eq("id", trip.id);
+
+      if(error) throw error;
+
+      // 成功：重新 render 以更新排序/時間
+      await render();
+    }catch(err){
+      console.error(err);
+      alert("改名失敗：" + (err.message || JSON.stringify(err)));
+      // 還原
+      trip.title = oldTitle;
+      await render();
+    }
+  };
+
+  const cancel = async () => {
+    await render();
+  };
+
+  input.addEventListener("keydown", (e) => {
+    if(e.key === "Enter") commit();
+    if(e.key === "Escape") cancel();
+  });
+
+  // 失焦也提交（你想改成失焦取消也可以）
+  input.addEventListener("blur", () => commit());
+}
+// ===== Cropper (Y-only, no zoom) =====
+const cropMask  = document.getElementById("cropMask");
+const cropStage = document.getElementById("cropStage");
+const cropImg   = document.getElementById("cropImg");
+
+const cropState = {
+  file: null,
+  objectUrl: null,
+  scaleBase: 1,   // 自動「剛好填滿裁切框」的比例（固定）
+  offsetY: 0,     // 只允許上下
+  dragging: false,
+  dragStartY: 0,
+  dragBaseY: 0,
+  resolver: null,
+  rejecter: null
+};
+
+function openCropper(tripId, file){
+  return new Promise((resolve, reject) => {
+    cropState.file = file;
+    cropState.resolver = resolve;
+    cropState.rejecter = reject;
+
+    // 先顯示 modal，否則 cropStage 尺寸會是 0
+    cropMask.style.display = "flex";
+    cropMask.setAttribute("aria-hidden", "false");
+
+    // 建立 object URL
+    if(cropState.objectUrl) URL.revokeObjectURL(cropState.objectUrl);
+    cropState.objectUrl = URL.createObjectURL(file);
+
+    cropImg.onload = () => {
+      // 等下一幀再量尺寸（確保 modal 真的布局完成）
+      requestAnimationFrame(() => {
+        const stageRect = cropStage.getBoundingClientRect();
+
+        cropState.scaleBase = Math.max(
+          stageRect.width / cropImg.naturalWidth,
+          stageRect.height / cropImg.naturalHeight
+        );
+
+        cropState.offsetY = 0;
+        applyCropTransform();
+      });
+    };
+
+    cropImg.onerror = () => {
+      reject(new Error("圖片載入失敗"));
+      closeCropper();
+    };
+
+    cropImg.src = cropState.objectUrl;
+  });
+}
+
+function closeCropper(){
+  cropMask.style.display = "none";
+  cropMask.setAttribute("aria-hidden", "true");
+  if(cropState.objectUrl){
+    URL.revokeObjectURL(cropState.objectUrl);
+    cropState.objectUrl = null;
+  }
+  cropImg.src = "";
+}
+
+function clampOffsetY(){
+  const stageH = cropStage.getBoundingClientRect().height;
+  const drawH = cropImg.naturalHeight * cropState.scaleBase;
+  const max = Math.max(0, (drawH - stageH) / 2);
+  cropState.offsetY = Math.max(-max, Math.min(max, cropState.offsetY));
+}
+
+function applyCropTransform(){
+  clampOffsetY();
+  cropImg.style.transform =
+    `translate(-50%, -50%) translate(0px, ${cropState.offsetY}px) scale(${cropState.scaleBase})`;
+}
+
+// 只上下拖曳
+cropStage.addEventListener("pointerdown", (e) => {
+  cropState.dragging = true;
+  cropStage.setPointerCapture(e.pointerId);
+  cropState.dragStartY = e.clientY;
+  cropState.dragBaseY = cropState.offsetY;
+});
+
+cropStage.addEventListener("pointermove", (e) => {
+  if(!cropState.dragging) return;
+  const dy = e.clientY - cropState.dragStartY;
+  cropState.offsetY = cropState.dragBaseY + dy;
+  applyCropTransform();
+});
+
+cropStage.addEventListener("pointerup", () => { cropState.dragging = false; });
+
+document.getElementById("cropClose").addEventListener("click", () => {
+  cropState.rejecter?.(new Error("cancel"));
+  closeCropper();
+});
+document.getElementById("cropCancel").addEventListener("click", () => {
+  cropState.rejecter?.(new Error("cancel"));
+  closeCropper();
+});
+document.getElementById("cropReset").addEventListener("click", () => {
+  cropState.offsetY = 0;
+  applyCropTransform();
+});
+
+async function cropToJpegBlob(){
+  const stageRect = cropStage.getBoundingClientRect();
+  const outW = Math.round(stageRect.width * 2);
+  const outH = Math.round(stageRect.height * 2);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = outW;
+  canvas.height = outH;
+  const ctx = canvas.getContext("2d");
+
+  const bitmap = await createImageBitmap(cropState.file);
+
+  const stageW = stageRect.width;
+  const stageH = stageRect.height;
+
+  const scale = cropState.scaleBase;
+  const drawW = bitmap.width * scale;
+  const drawH = bitmap.height * scale;
+
+  const centerX = stageW / 2; // X 固定置中
+  const centerY = stageH / 2 + cropState.offsetY;
+
+  const imgX = centerX - drawW / 2;
+  const imgY = centerY - drawH / 2;
+
+  const kx = outW / stageW;
+  const ky = outH / stageH;
+
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, outW, outH);
+  ctx.drawImage(bitmap, imgX * kx, imgY * ky, drawW * kx, drawH * ky);
+
+  return await new Promise((resolve) => {
+    canvas.toBlob((b) => resolve(b), "image/jpeg", 0.88);
+  });
+}
+
+document.getElementById("cropOk").addEventListener("click", async () => {
+  try{
+    const blob = await cropToJpegBlob();
+    cropState.resolver?.(blob);
+  }catch(err){
+    cropState.rejecter?.(err);
+  }finally{
+    closeCropper();
+  }
+});
+
+
+  async function render(){
+    const list = await loadIndex();
+    const q = ($("search").value || "").trim().toLowerCase();
+
+    const filtered = q
+      ? list.filter(t => (t.title||"").toLowerCase().includes(q))
+      : list;
+
+    $("list").innerHTML = "";
+    $("empty").hidden = filtered.length !== 0;
+
+    filtered.forEach(trip => {
+      const el = document.createElement("div");
+      el.className = "card";
+      el.dataset.tripId = trip.id;
+      el.innerHTML = `
+  <div class="headerTools">
+    <label class="iconBtn" title="上傳/更換封面">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+        <circle cx="12" cy="13" r="4"></circle>
+      </svg>
+      <input type="file" accept="image/*" data-upload="${trip.id}" style="display:none" />
+    </label>
+  </div>
+
+  <!-- 封面照片 -->
+  <div class="tripCardHeader" style="${trip.headerUrl ? `background-image:url('${escapeHtml(trip.headerUrl)}')` : ""}">
+    <div class="tripCardHeaderOverlay"></div>
+  </div>
+
+  <!-- Title（獨立一行） -->
+  <button class="tripTitleBtn" type="button" data-edit-title="${trip.id}">
+    ${escapeHtml(trip.title)}
+  </button>
+
+  <!-- 底部：開啟筆記/刪除（左） + 日期資訊（右） -->
+  <div class="tripFooterRow">
+    <div class="tripFooterLeft">
+		  <div class="tripCardTools">
+
+		    <!-- 三點 -->
+		    <button class="tripMoreBtn" type="button" data-trip-more aria-label="更多">⋮</button>
+
+				<!-- 黃色鈴鐺指示：只有此 trip 是目前訂閱 trip 才顯示 -->
+		    <span class="tripBellIndicator" data-bell-indicator hidden aria-hidden="true">
+		      <svg viewBox="0 0 24 24" aria-hidden="true">
+		        <path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z"></path>
+		      </svg>
+		    </span>
+		    
+		    <!-- menu -->
+		    <div class="tripMenu" data-trip-menu hidden>
+		      <button class="tripMenuItem danger" type="button" data-trip-delete>
+					  <span style="width:18px;text-align:center;">🗑️</span>
+					  <span>刪除此行程</span>
+					</button>
+		      <button class="tripMenuItem" type="button" data-trip-push-toggle></button>
+		    </div>
+		  </div>
+		</div>
+
+    <div class="tripFooterRight">
+		  <div class="tripMetaLine">
+		    <span class="tripMetaLabel">建立：</span>
+		    <span class="tripMetaValue">${fmt(trip.createdAt)}</span>
+		  </div>
+		  <div class="tripMetaLine">
+		    <span class="tripMetaLabel">更新：</span>
+		    <span class="tripMetaValue">${fmt(trip.updatedAt)}</span>
+		  </div>
+		</div>
+  </div>
+`;
+			// ✅ 點整張 card 開啟筆記（包含封面與空白處）
+			// 🚫 排除：相機上傳、刪除、重新命名
+			el.addEventListener("click", (e) => {
+			  if(e.target.closest(
+			    'label.iconBtn, input[data-upload], button[data-edit-title], input.tripTitleInput, [data-trip-more], [data-trip-menu]'
+			  )) return;
+
+			  const canEdit = CAN_EDIT ? "1" : "0";
+			  // 同時存一份，避免 iOS/PWA sessionStorage 不同
+			  //localStorage.setItem("can_edit", canEdit);
+
+			  location.href = `${NOTEBOOK_FILE}?trip=${encodeURIComponent(trip.id)}&can_edit=${canEdit}`;
+			});
+						
+      el.querySelector(`[data-edit-title="${trip.id}"]`)?.addEventListener("click", () => {
+  			startInlineRename(el, trip);
+			});
+
+      el.querySelector("[data-trip-delete]")?.addEventListener("click", async (e) => {
+			  e.preventDefault();
+			  e.stopPropagation();
+			  
+			  if(!requireEdit("刪除")) return;
+
+			  if(!confirm(`確定刪除「${trip.title}」？\n（會同時刪除所有照片）`)) return;
+
+			  try{
+			    await removeFolderDeep(trip.id);
+
+			    const { error } = await supabase.from("trips").delete().eq("id", trip.id);
+			    if(error) throw error;
+
+			    localStorage.removeItem(trip.storageKey);
+			    const trips = (await loadIndex()).filter(x => x.id !== trip.id);
+			    saveIndex(trips);
+			    render();
+			  }catch(err){
+			    console.error(err);
+			    alert("刪除失敗：" + (err.message || JSON.stringify(err)));
+			  }
+			});
+
+			el.querySelector(`input[data-upload="${trip.id}"]`)?.addEventListener("change", async (e) => {
+			  if(!requireEdit("上傳封面")) { e.target.value=""; return; }
+			  const file = e.target.files?.[0];
+			  if(!file) return;
+
+			  if(file.size > 8 * 1024 * 1024){
+			    alert("圖片太大，請小於 8MB");
+			    e.target.value = "";
+			    return;
+			  }
+
+			  try{
+			    // 1) 開裁切 modal → 得到裁切後 blob（jpeg）
+			    const croppedBlob = await openCropper(trip.id, file);
+
+			    // 2) 上傳（固定路徑 header.jpg + upsert 覆蓋）
+			    await uploadTripHeader(trip.id, croppedBlob);
+
+			    // 3) 重新 render 刷新背景
+			    await render();
+			  }catch(err){
+			    if(err?.message !== "cancel"){
+			      console.error(err);
+			      alert("上傳失敗：" + (err.message || JSON.stringify(err)));
+			    }
+			  }finally{
+			    e.target.value = "";
+			  }
+			});
+      applyTripCardPushUI(el, trip.id);
+      $("list").appendChild(el);
+    });
+  }
+
+  // Events
+  $("btnNew").addEventListener("click", async () => {
+    if(!requireEdit("建立旅程")) return;
+    const title = prompt("旅程名稱", "");
+    if(title === null) return;
+
+    const trip = newTripTemplate(title.trim() || "未命名旅程");
+
+    const { error } = await supabase.from("trips").insert({
+      id: trip.id,
+      title: trip.title,
+      created_at: trip.createdAt,
+      updated_at: trip.updatedAt
+    });
+
+    if(error){ console.error(error); alert("新增失敗"); return; }
+
+    // 快取到 local
+    const trips = await loadIndex();
+    trips.unshift(trip);
+    saveIndex(trips);
+
+    initNotebookDataIfMissing(trip);
+    const canEdit = CAN_EDIT ? "1" : "0";
+		location.href = `${NOTEBOOK_FILE}?trip=${encodeURIComponent(trip.id)}&can_edit=${canEdit}`;
+  	//sessionStorage.setItem("can_edit", CAN_EDIT ? "1" : "0");
+  });
+
+  $("search").addEventListener("input", () => render());
+
+  let openedMenu = null;
+
+	function closeMenu(){
+	  if(openedMenu){
+	    openedMenu.hidden = true;
+	    openedMenu = null;
+	  }
+	}
+
+	// 點外面關閉
+	document.addEventListener("click", (e) => {
+	  if(openedMenu && !e.target.closest("[data-trip-menu]") && !e.target.closest("[data-trip-more]")){
+	    closeMenu();
+	  }
+	}, true);
+
+	// 三點按鈕：開/關 menu
+	document.addEventListener("click", (e) => {
+	  const btn = e.target.closest("[data-trip-more]");
+	  if(!btn) return;
+
+	  const card = btn.closest(".card[data-trip-id]");
+	  const menu = card?.querySelector("[data-trip-menu]");
+	  if(!menu) return;
+
+	  if(openedMenu && openedMenu !== menu) closeMenu();
+
+	  menu.hidden = !menu.hidden;
+	  openedMenu = menu.hidden ? null : menu;
+
+	  e.preventDefault();
+	  e.stopPropagation();
+	}, true);
+
+	// menu：開/關通知
+	document.addEventListener("click", async (e) => {
+	  const btn = e.target.closest("[data-trip-push-toggle]");
+	  if(!btn) return;
+	  
+	  //if(!requireEdit("變更通知")) return;
+
+	  const card = btn.closest(".card[data-trip-id]");
+	  const tripId = card?.dataset.tripId;
+	  if(!tripId) return;
+
+	  closeMenu();
+	  e.preventDefault();
+	  e.stopPropagation();
+
+	  // 若目前已綁在別的 trip，提醒使用者（因為你 DB 設計一次只能綁一個）
+	  if(pushState.tripId && pushState.tripId !== tripId){
+	    const ok = confirm("此裝置目前已在另一個行程開啟通知。\n要改為此行程嗎？");
+	    if(!ok) return;
+	  }
+
+	  if(pushState.tripId === tripId){
+	    await disablePush();
+	  }else{
+	    await enablePushForTrip(tripId);
+	  }
+
+	  await loadPushStateFromDb();
+	  await render();
+	}, true);
+	  
+  await ensureServiceWorkerReady();
+	await loadPushStateFromDb();
+
+	CAN_EDIT = await resolveEditPermission();
+
+	await render();
+
+	// 如果是唯讀，把 UI 清掉（因為 render 已把卡片產生）
+	if(!CAN_EDIT){
+	  applyReadOnlyUI();
+	}
+  document.getElementById("btnReload")?.addEventListener("click", () => {
+  	location.href = location.pathname + "?t=" + Date.now();
+	});
+</script>
+</body>
+</html>
